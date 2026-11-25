@@ -1,0 +1,76 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>إنشاء حساب | دمياطي</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#edf3f9;font-family:Arial;color:#222}
+header{background:#105b96;color:white;text-align:center;padding:22px}
+header h1{margin:0}
+.container{max-width:520px;margin:25px auto;padding:15px}
+.card{background:white;padding:23px;border-radius:14px;box-shadow:0 3px 12px #ddd}
+h2{color:#105b96;text-align:center}
+label{display:block;margin-top:15px;font-weight:bold}
+input,select{width:100%;padding:12px;margin-top:7px;border:1px solid #ccc;border-radius:8px;font-size:16px}
+button{width:100%;padding:14px;margin-top:20px;border:0;border-radius:9px;background:#1269a8;color:white;font-size:17px;font-weight:bold}
+.note{background:#e8f2fa;padding:12px;border-radius:8px;margin-top:15px;font-size:14px}
+</style>
+</head>
+<body>
+<header>
+<h1>دمياطي DAMYATI</h1>
+<p>انضم إلى سوق الأثاث</p>
+</header>
+<div class="container">
+<div class="card">
+<h2>إنشاء حساب جديد</h2>
+
+<label>نوع الحساب</label>
+<select id="accountType" onchange="changeType()">
+<option value="customer">حساب شخصي - عميل</option>
+<option value="showroom">حساب تجاري - معرض أثاث</option>
+</select>
+
+<label>الاسم</label>
+<input type="text" placeholder="اكتب اسمك">
+
+<label>رقم الهاتف</label>
+<input type="tel" placeholder="01xxxxxxxxx">
+
+<div id="showroomFields" style="display:none">
+<label>اسم المعرض</label>
+<input type="text" placeholder="اسم المعرض">
+<label>المحافظة</label>
+<select>
+<option>اختر المحافظة</option>
+<option>دمياط</option>
+<option>الدقهلية</option>
+<option>القاهرة</option>
+<option>الشرقية</option>
+<option>أخرى</option>
+</select>
+</div>
+
+<label>كلمة المرور</label>
+<input type="password" placeholder="كلمة المرور">
+
+<button onclick="alert('هذه استمارة تجريبية، وسيتم تفعيل التسجيل الحقيقي لاحقاً')">إنشاء الحساب</button>
+
+<div class="note">
+التسجيل في هذه المرحلة تجريبي، ولا يتم حفظ البيانات أو إنشاء حساب حقيقي حتى الآن.
+</div>
+</div>
+</div>
+
+<script>
+function changeType(){
+const type=document.getElementById('accountType').value;
+document.getElementById('showroomFields').style.display=
+type==='showroom'?'block':'none';
+}
+</script>
+</body>
+</html>

@@ -4,106 +4,85 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>سوق دمياطي للأثاث</title>
+<title>دمياطي | سوق الأثاث</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#f1f4f8;font-family:Arial;color:#183653}
-header{background:#123e70;color:white;padding:20px;text-align:center}
-header h1{margin:0}
+body{margin:0;background:#f0f2f5;font-family:Arial,sans-serif;color:#222}
+header{background:#1264a3;color:white;padding:18px;text-align:center}
+header h1{margin:0;font-size:28px}
+header p{margin:7px 0 0}
 nav{background:white;padding:13px;text-align:center;box-shadow:0 2px 5px #ddd}
-nav a{color:#174d82;text-decoration:none;margin:8px;font-weight:bold}
-.container{max-width:950px;margin:20px auto;padding:12px}
-h2{color:#174d82}
-.search{background:white;padding:15px;border-radius:12px;margin-bottom:20px}
-input,select{width:100%;padding:12px;margin:6px 0;border:1px solid #ddd;border-radius:8px;font-size:15px}
-.categories{display:flex;gap:8px;overflow:auto;margin:15px 0}
-.categories span{background:#dceafa;color:#174d82;padding:12px;border-radius:20px;white-space:nowrap}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-.card{background:white;border-radius:12px;overflow:hidden;box-shadow:0 2px 7px #ddd}
-.photo{height:145px;background:#e4ebf4;display:flex;align-items:center;justify-content:center;font-size:48px}
-.info{padding:12px}
-.price{color:#167044;font-weight:bold}
-button{background:#174d82;color:white;border:0;padding:11px;border-radius:7px;width:100%;margin-top:8px;font-size:15px}
-.note{text-align:center;color:#777;margin-top:25px}
-@media(min-width:650px){.grid{grid-template-columns:repeat(3,1fr)}}
+nav a{color:#1264a3;text-decoration:none;margin:0 9px;font-weight:bold}
+.container{max-width:650px;margin:20px auto;padding:0 12px}
+.welcome{background:#1264a3;color:white;padding:20px;border-radius:12px;text-align:center}
+.welcome h2{margin-top:0}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:15px 0}
+.actions button{padding:15px;border:0;border-radius:10px;background:white;color:#1264a3;font-size:16px;font-weight:bold}
+.card{background:white;padding:16px;border-radius:12px;margin:14px 0;box-shadow:0 2px 6px #ddd}
+.card h3{color:#1264a3;margin-top:0}
+.post-image{background:#e8f1f8;border-radius:10px;padding:25px;text-align:center;font-size:55px;margin:12px 0}
+.small{color:#777;font-size:13px}
+button{cursor:pointer}
+.footer{text-align:center;padding:25px;color:#777}
 </style>
 </head>
 <body>
+
 <header>
-<h1>دمياطي</h1>
-<p>سوق الأثاث المصري</p>
+<h1>دمياطي DAMYATI</h1>
+<p>سوق الأثاث المصري يجمعنا</p>
 </header>
+
 <nav>
 <a href="index.html">الرئيسية</a>
-<a href="register.html">سجل معرضك</a>
+<a href="market.html">السوق</a>
+<a href="register.html">تسجيل معرض</a>
 </nav>
+
 <div class="container">
-<h2>اكتشف الأثاث</h2>
-<div class="search">
-<input type="search" placeholder="ابحث عن غرفة نوم أو انتريه...">
-<select>
-<option>كل أنواع الأثاث</option>
-<option>غرف نوم</option>
-<option>انتريهات</option>
-<option>سفرات</option>
-<option>غرف أطفال</option>
-<option>مطابخ</option>
-</select>
-<select>
-<option>كل المحافظات</option>
-<option>دمياط</option>
-<option>القاهرة</option>
-<option>الإسكندرية</option>
-<option>الدقهلية</option>
-</select>
+
+<div class="welcome">
+<h2>أهلاً بك في دمياطي</h2>
+<p>بيع وشراء الأثاث.. تواصل مع المعارض والعملاء في مكان واحد</p>
 </div>
-<div class="categories">
-<span>غرف نوم</span>
-<span>انتريهات</span>
-<span>سفرات</span>
-<span>أطفال</span>
-<span>مطابخ</span>
+
+<div class="actions">
+<button onclick="alert('سيتم تفعيل نشر طلبك بعد تجهيز التسجيل')">📝 اطلب أثاثك</button>
+<button onclick="alert('سيتم تفعيل إضافة المنتجات للمعارض المعتمدة')">🛋️ اعرض أثاثك</button>
 </div>
-<h2>أحدث المنتجات</h2>
-<div class="grid">
+
 <div class="card">
-<div class="photo">🛏️</div>
-<div class="info">
-<b>غرفة نوم مودرن</b>
-<p>تصميم عصري أنيق</p>
-<p class="price">السعر عند الاستفسار</p>
-<button onclick="alert('قريبًا: التواصل مع المعرض بعد تسجيل الدخول')">تواصل مع المعرض</button>
+<h3>📢 أحدث المنشورات</h3>
+<p>هنا ستظهر منشورات العملاء والمعارض في مكان واحد.</p>
+<p class="small">منصة دمياطي تجمع الجميع</p>
 </div>
-</div>
+
 <div class="card">
-<div class="photo">🛋️</div>
-<div class="info">
-<b>انتريه مودرن</b>
-<p>تصميم مريح وأنيق</p>
-<p class="price">السعر عند الاستفسار</p>
-<button onclick="alert('قريبًا: التواصل مع المعرض بعد تسجيل الدخول')">تواصل مع المعرض</button>
+<h3>🛏️ معرض غرف النوم</h3>
+<div class="post-image">🛏️</div>
+<p>غرف نوم مودرن بتصميمات عصرية.</p>
+<p class="small">منشور تجريبي - معرض أثاث</p>
 </div>
-</div>
+
 <div class="card">
-<div class="photo">🪑</div>
-<div class="info">
-<b>سفرة عصرية</b>
-<p>تصميم خشبي مميز</p>
-<p class="price">السعر عند الاستفسار</p>
-<button onclick="alert('قريبًا: التواصل مع المعرض بعد تسجيل الدخول')">تواصل مع المعرض</button>
+<h3>🛋️ طلب عميل</h3>
+<div class="post-image">🛋️</div>
+<p>مطلوب انتريه مودرن بلون هادئ.</p>
+<p class="small">منشور تجريبي - عميل</p>
 </div>
-</div>
+
 <div class="card">
-<div class="photo">🧸</div>
-<div class="info">
-<b>غرفة أطفال</b>
-<p>ألوان وتصميمات جميلة</p>
-<p class="price">السعر عند الاستفسار</p>
-<button onclick="alert('قريبًا: التواصل مع المعرض بعد تسجيل الدخول')">تواصل مع المعرض</button>
+<h3>🍽️ سفرة مودرن</h3>
+<div class="post-image">🍽️</div>
+<p>أفكار وتصميمات للسفرات العصرية.</p>
+<p class="small">منشور تجريبي - معرض أثاث</p>
 </div>
+
 </div>
+
+<div class="footer">
+دمياطي DAMYATI © 2026
 </div>
-<p class="note">دمياطي - بيت الأثاث المصري</p>
-</div>
+
 </body>
 </html>

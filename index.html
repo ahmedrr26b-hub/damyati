@@ -1,0 +1,70 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>دمياطي - سوق الأثاث المصري</title>
+<style>
+body{margin:0;background:#f3f6fa;font-family:Tahoma,Arial;color:#24364b}
+header{background:#123b70;color:white;text-align:center;padding:22px}
+header h1{margin:0;font-size:32px}
+header p{margin:6px}
+nav{background:white;padding:15px;text-align:center}
+nav a{color:#123b70;text-decoration:none;margin:8px;font-weight:bold}
+.hero{background:linear-gradient(120deg,#123b70,#397db8);color:white;text-align:center;padding:35px 15px}
+.hero h2{font-size:26px}
+button{background:white;color:#123b70;border:0;border-radius:7px;padding:12px 20px;font-weight:bold}
+main{max-width:850px;margin:20px auto;padding:10px}
+.card{background:white;border-radius:12px;padding:20px;margin:15px 0}
+h3{color:#123b70}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.item{background:#e6eff9;padding:25px;text-align:center;border-radius:9px;font-weight:bold}
+footer{background:#123b70;color:white;text-align:center;padding:20px}
+</style>
+</head>
+<body>
+<header>
+<h1>دمياطي</h1>
+<p>DAMYATI MARKET</p>
+</header>
+<nav>
+<a href="#">الرئيسية</a>
+<a href="#furniture">الأثاث</a>
+<a href="#showrooms">المعارض</a>
+<a href="#requests">طلبات العملاء</a>
+<a href="#shipping">الشحن</a>
+</nav>
+<section class="hero">
+<h2>أهلاً بك في دمياطي</h2>
+<p>سوق يجمع الأثاث المصري والعملاء والمعارض في مكان واحد</p>
+<button onclick="document.getElementById('requests').scrollIntoView()">اطلب أثاثك الآن</button>
+</section>
+<main>
+<section class="card" id="furniture">
+<h3>تصفح الأثاث</h3>
+<div class="grid">
+<div class="item">🛏️ غرف النوم</div>
+<div class="item">🛋️ الانتريهات</div>
+<div class="item">🍽️ السفرات</div>
+<div class="item">🧸 غرف الأطفال</div>
+<div class="item">🍳 المطابخ</div>
+<div class="item">🪑 الأثاث المكتبي</div>
+</div>
+</section>
+<section class="card" id="showrooms">
+<h3>المعارض المعتمدة</h3>
+<p>اكتشف المعارض المصرية وتصفح منتجاتها وعروضها.</p>
+</section>
+<section class="card" id="requests">
+<h3>طلبات العملاء</h3>
+<p>اكتب احتياجك من الأثاث لتصل إليك عروض المعارض.</p>
+</section>
+<section class="card" id="shipping">
+<h3>شركات الشحن</h3>
+<p>قريباً: خدمات نقل الأثاث لجميع محافظات مصر.</p>
+</section>
+</main>
+<footer>دمياطي DAMYATI © 2026</footer>
+</body>
+</html>

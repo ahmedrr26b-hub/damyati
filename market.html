@@ -225,7 +225,59 @@ card.append(messageBtn);
      card.append(price);
    }
 
-   list.append(card);
+   // قسم الإعجابات
+const likesBox = document.createElement("div");
+
+const likeBtn = document.createElement("button");
+likeBtn.textContent = "❤️ إعجاب";
+
+const likesCount = document.createElement("span");
+likesCount.textContent = " جاري تحميل الإعجابات... ";
+
+likesBox.append(likeBtn, likesCount);
+card.append(likesBox);
+
+// جلب عدد الإعجابات
+const { count } = await supabase
+  .from("post_likes")
+  .select("*", { count: "exact", head: true })
+  .eq("post_id", post.id);
+
+likesCount.textContent = " " + (count || 0) + " إعجاب";
+
+likeBtn.onclick = async () => {
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    alert("سجل الدخول أولاً للإعجاب");
+    return;
+  }
+
+  const { data: existing } = await supabase
+    .from("post_likes")
+    .select("id")
+    .eq("post_id", post.id)
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (existing) {
+    await supabase.from("post_likes").delete().eq("id", existing.id);
+  } else {
+    await supabase.from("post_likes").insert({
+      post_id: post.id,
+      user_id: user.id
+    });
+  }
+
+  const { count: newCount } = await supabase
+    .from("post_likes")
+    .select("*", { count: "exact", head: true })
+    .eq("post_id", post.id);
+
+  likesCount.textContent = " " + (newCount || 0) + " إعجاب";
+};
+
+list.append(card);
  });
 }
 

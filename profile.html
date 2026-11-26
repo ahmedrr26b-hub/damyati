@@ -42,7 +42,14 @@ button {
 <body>
 
 <div class="box">
-  <h2>صفحتي الشخصية</h2>https://placehold.co/120x120?text=Photo
+  <h2>صفحتي الشخصية</h2><div style="margin:15px">
+  <img id="avatar"
+  src="https://placehold.co/120x120?text=Photo"
+  style="width:120px;height:120px;border-radius:50%;object-fit:cover">
+  <br>
+  <input type="file" id="avatarFile" accept="image/*">
+  <button onclick="uploadAvatar()">رفع الصورة</button>
+</div>
   <p id="message">جارٍ تحميل بيانات حسابك...</p>
 
   <div id="profile" hidden>

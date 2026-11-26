@@ -1,0 +1,139 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ريلز دمياطي</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#101820;color:white;font-family:Arial}
+header{padding:16px;background:#173448;display:flex;justify-content:space-between}
+header a{color:white;text-decoration:none}
+h2{margin:0;color:#55c5e8}
+.upload{padding:15px;background:#1c3040;margin:12px;border-radius:12px}
+input,textarea,button{width:100%;padding:12px;margin-top:10px;border:0;border-radius:8px;font-size:16px}
+button{background:#13a5d1;color:white;font-weight:bold}
+button:disabled{opacity:.5}
+#message{text-align:center;padding:8px}
+.feed{max-width:550px;margin:auto}
+.reel{height:75vh;min-height:450px;position:relative;background:#000;margin:12px;border-radius:14px;overflow:hidden}
+.reel video{width:100%;height:100%;object-fit:contain}
+.details{position:absolute;bottom:0;right:0;left:0;padding:18px;background:linear-gradient(transparent,rgba(0,0,0,.9))}
+.name{font-weight:bold;color:#65d6ff}
+.empty{text-align:center;padding:35px;color:#ccc}
+</style>
+</head>
+<body>
+<header>
+<h2>دمياطي 🎥</h2>
+<a href="market.html">السوق</a>
+</header>
+
+<div class="upload">
+<h3>انشر فيديو أثاث جديد</h3>
+<input id="videoFile" type="file" accept="video/mp4,video/webm">
+<textarea id="caption" placeholder="اكتب وصف الفيديو..."></textarea>
+<button id="uploadBtn" onclick="uploadReel()">نشر الفيديو</button>
+<p id="message"></p>
+</div>
+
+<div class="feed" id="feed">
+<div class="empty">جارٍ تحميل الفيديوهات...</div>
+</div>
+
+<script>
+const SUPABASE_URL = "https://lytlefegtvcjgfvfbwnu.supabase.co";
+const SUPABASE_KEY = "sb_publishable_sIBXEfGZV73j0kDb27oykw_KsPcD0dk";
+const db = supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+async function uploadReel(){
+ const message=document.getElementById("message");
+ const file=document.getElementById("videoFile").files[0];
+ const caption=document.getElementById("caption").value.trim();
+ const btn=document.getElementById("uploadBtn");
+
+ if(!file){message.textContent="اختار فيديو الأول";return;}
+ if(!["video/mp4","video/webm"].includes(file.type)){
+ message.textContent="ارفع MP4 أو WebM فقط";return;
+ }
+ if(file.size>50*1024*1024){
+ message.textContent="حجم الفيديو أكبر من 50 ميجابايت";return;
+ }
+
+ btn.disabled=true;
+ message.textContent="جارٍ رفع الفيديو...";
+
+ try{
+ const {data:{user},error:userError}=await db.auth.getUser();
+ if(userError)throw userError;
+ if(!user)throw new Error("سجل دخولك الأول");
+
+ const path=user.id+"/"+Date.now()+"_"+file.name.replace(/[^a-zA-Z0-9._-]/g,"_");
+ const {error:uploadError}=await db.storage.from("post-videos").upload(path,file);
+ if(uploadError)throw uploadError;
+
+ const {data:urlData}=db.storage.from("post-videos").getPublicUrl(path);
+
+ const {error:insertError}=await db.from("reels").insert({
+ user_id:user.id,
+ video_url:urlData.publicUrl,
+ caption:caption,
+ user_name:user.user_metadata?.full_name || user.email,
+ user_avatar:user.user_metadata?.avatar_url || null
+ });
+ if(insertError)throw insertError;
+
+ message.textContent="تم نشر الفيديو بنجاح";
+ document.getElementById("videoFile").value="";
+ document.getElementById("caption").value="";
+ await loadReels();
+
+ }catch(error){
+ message.textContent="حصل خطأ: "+error.message;
+ }finally{
+ btn.disabled=false;
+ }
+}
+
+async function loadReels(){
+ const feed=document.getElementById("feed");
+ const {data,error}=await db.from("reels").select("*").order("created_at",{ascending:false});
+ if(error){
+ feed.innerHTML='<div class="empty">تعذر تحميل الفيديوهات</div>';
+ return;
+ }
+ if(!data.length){
+ feed.innerHTML='<div class="empty">لسه مفيش فيديوهات. كن أول من ينشر فيديو أثاث!</div>';
+ return;
+ }
+ feed.innerHTML="";
+ data.forEach(reel=>{
+ const card=document.createElement("div");
+ card.className="reel";
+ const video=document.createElement("video");
+ video.src=reel.video_url;
+ video.controls=true;
+ video.autoplay=true;
+ video.muted=true;
+ video.loop=true;
+ video.playsInline=true;
+
+ const details=document.createElement("div");
+ details.className="details";
+ const name=document.createElement("div");
+ name.className="name";
+ name.textContent=reel.user_name || "عضو دمياطي";
+ const caption=document.createElement("p");
+ caption.textContent=reel.caption || "";
+ details.append(name,caption);
+ card.append(video,details);
+ feed.append(card);
+ });
+}
+
+loadReels();
+</script>
+</body>
+</html>

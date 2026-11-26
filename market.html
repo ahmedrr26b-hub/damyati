@@ -235,7 +235,6 @@ messageBtn.onclick = () => {
 
    // قسم الإعجابات
 const likesBox = document.createElement("div");
-likeBtn.textContent = "❤️ إعجاب";
 likesBox.style.cssText = `
   display:flex;
   align-items:center;
@@ -248,6 +247,7 @@ likesBox.style.cssText = `
 `;
 
 const likeBtn = document.createElement("button");
+likeBtn.textContent = "❤️ إعجاب";
 likeBtn.style.cssText = `
   background:#1769aa;
   color:white;

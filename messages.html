@@ -1,0 +1,187 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>رسائل دمياطي</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f1f4f7;color:#203040;font-family:Arial}
+header{background:#173448;color:white;padding:16px;display:flex;justify-content:space-between}
+header a{color:white;text-decoration:none}
+main{max-width:650px;margin:18px auto;padding:12px}
+.panel{background:white;border-radius:12px;padding:15px;margin-bottom:15px}
+h2,h3{margin-top:0}
+input,textarea,button{width:100%;padding:12px;margin-top:10px;border:1px solid #ddd;border-radius:8px;font-size:15px}
+button{background:#159dc5;color:white;border:0;font-weight:bold}
+button:disabled{opacity:.5}
+.message{padding:11px;margin:8px 0;border-radius:10px;background:#edf2f5;max-width:85%;overflow-wrap:anywhere}
+.mine{background:#d7f3ff;margin-right:auto}
+.theirs{margin-left:auto}
+.small{font-size:12px;color:#71808c}
+#chat{min-height:180px;max-height:400px;overflow-y:auto}
+.item{padding:12px;border-bottom:1px solid #eee;cursor:pointer}
+.item:last-child{border:0}
+#status{color:#b34b35}
+</style>
+</head>
+<body>
+
+<header>
+<strong>💬 رسائل دمياطي</strong>
+<a href="market.html">العودة للسوق</a>
+</header>
+
+<main>
+<div class="panel">
+<h3>محادثة جديدة</h3>
+<input id="recipient" placeholder="رقم حساب المستخدم (User ID)">
+<button onclick="openChat()">فتح المحادثة</button>
+<p class="small">يمكن بدء المحادثة عند معرفة رقم حساب المعرض أو العميل.</p>
+</div>
+
+<div class="panel">
+<h3 id="chatTitle">المحادثة</h3>
+<div id="chat"><p class="small">اختر محادثة للبدء.</p></div>
+<textarea id="messageText" placeholder="اكتب رسالتك هنا..." rows="3"></textarea>
+<button id="sendBtn" onclick="sendMessage()">إرسال الرسالة</button>
+<p id="status"></p>
+</div>
+
+<div class="panel">
+<h3>محادثاتي</h3>
+<div id="inbox">جارٍ تحميل المحادثات...</div>
+</div>
+</main>
+
+<script>
+const SUPABASE_URL="https://lytlefegtvcjgfvfbwnu.supabase.co";
+const SUPABASE_KEY="sb_publishable_sIBXEfGZV73j0kDb27oykw_KsPcD0dk";
+const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+let currentUser=null;
+let otherUser=null;
+
+const chat=document.getElementById("chat");
+const statusText=document.getElementById("status");
+
+async function start(){
+ const {data,error}=await db.auth.getUser();
+ if(error || !data.user){
+  document.getElementById("inbox").textContent="سجل دخولك أولاً لعرض رسائلك.";
+  document.getElementById("sendBtn").disabled=true;
+  return;
+ }
+ currentUser=data.user;
+
+ const params=new URLSearchParams(location.search);
+ const to=params.get("to");
+ if(to){
+  document.getElementById("recipient").value=to;
+  await selectChat(to);
+ }
+ await loadInbox();
+}
+
+async function openChat(){
+ const id=document.getElementById("recipient").value.trim();
+ if(!id){alert("اكتب رقم حساب المستخدم أولاً");return;}
+ await selectChat(id);
+}
+
+async function selectChat(id){
+ if(!currentUser)return;
+ if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)){
+  alert("رقم الحساب غير صحيح");
+  return;
+ }
+ if(id===currentUser.id){alert("لا يمكنك مراسلة حسابك الشخصي");return;}
+ otherUser=id;
+ document.getElementById("chatTitle").textContent="المحادثة";
+ document.getElementById("recipient").value=id;
+ await loadChat();
+}
+
+async function loadChat(){
+ if(!otherUser)return;
+ const {data,error}=await db.from("direct_messages")
+ .select("*")
+ .or("and(sender_id.eq."+currentUser.id+",receiver_id.eq."+otherUser+"),and(sender_id.eq."+otherUser+",receiver_id.eq."+currentUser.id+")")
+ .order("created_at",{ascending:true});
+
+ chat.replaceChildren();
+ if(error){chat.textContent="تعذر تحميل المحادثة: "+error.message;return;}
+ if(!data.length){chat.textContent="ابدأ المحادثة بإرسال أول رسالة." ;return;}
+
+ data.forEach(m=>{
+  const div=document.createElement("div");
+  div.className="message "+(m.sender_id===currentUser.id?"mine":"theirs");
+  div.textContent=m.message;
+  const time=document.createElement("div");
+  time.className="small";
+  time.textContent=new Date(m.created_at).toLocaleString("ar-EG");
+  div.appendChild(time);
+  chat.appendChild(div);
+ });
+ chat.scrollTop=chat.scrollHeight;
+}
+
+async function sendMessage(){
+ const text=document.getElementById("messageText").value.trim();
+ const btn=document.getElementById("sendBtn");
+ if(!currentUser){statusText.textContent="سجل دخولك أولاً";return;}
+ if(!otherUser){statusText.textContent="اختر محادثة أولاً";return;}
+ if(!text)return;
+
+ btn.disabled=true;
+ statusText.textContent="جارٍ الإرسال...";
+
+ const {error}=await db.from("direct_messages").insert({
+  sender_id:currentUser.id,
+  receiver_id:otherUser,
+  message:text
+ });
+
+ btn.disabled=false;
+ if(error){statusText.textContent="تعذر الإرسال: "+error.message;return;}
+
+ document.getElementById("messageText").value="";
+ statusText.textContent="تم إرسال الرسالة";
+ await loadChat();
+ await loadInbox();
+}
+
+async function loadInbox(){
+ const inbox=document.getElementById("inbox");
+ if(!currentUser)return;
+
+ const {data,error}=await db.from("direct_messages")
+ .select("*")
+ .or("sender_id.eq."+currentUser.id+",receiver_id.eq."+currentUser.id)
+ .order("created_at",{ascending:false})
+ .limit(100);
+
+ inbox.replaceChildren();
+ if(error){inbox.textContent="تعذر تحميل المحادثات";return;}
+ if(!data.length){inbox.textContent="لا توجد محادثات حتى الآن.";return;}
+
+ const seen=new Set();
+ data.forEach(m=>{
+  const id=m.sender_id===currentUser.id?m.receiver_id:m.sender_id;
+  if(seen.has(id))return;
+  seen.add(id);
+
+  const item=document.createElement("div");
+  item.className="item";
+  item.textContent="محادثة مع حساب: "+id;
+  item.onclick=()=>selectChat(id);
+  inbox.appendChild(item);
+ });
+}
+
+start();
+</script>
+</body>
+</html>

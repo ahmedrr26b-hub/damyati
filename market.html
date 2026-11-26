@@ -197,7 +197,6 @@ messageBtn.textContent = "💬 راسل صاحب المنشور";
 messageBtn.onclick = () => {
   window.location.href = "messages.html?to=" + encodeURIComponent(post.user_id);
 };
-card.append(messageBtn);
 
    const type = document.createElement("p");
    type.className = "small";
@@ -236,7 +235,7 @@ likesCount.textContent = " جاري تحميل الإعجابات... ";
 
 likesBox.append(likeBtn, likesCount);
 card.append(likesBox);
-
+card.append(messageBtn);
 // جلب عدد الإعجابات
 const { count } = await db
   .from("post_likes")
@@ -275,87 +274,6 @@ likeBtn.onclick = async () => {
     .eq("post_id", post.id);
 
   likesCount.textContent = " " + (newCount || 0) + " إعجاب";
-};
-// قسم التعليقات
-const commentsBox = document.createElement("div");
-
-const commentsTitle = document.createElement("h4");
-commentsTitle.textContent = "💬 التعليقات";
-
-const commentsList = document.createElement("div");
-commentsList.textContent = "جارٍ تحميل التعليقات...";
-
-const commentInput = document.createElement("input");
-commentInput.placeholder = "اكتب تعليقك...";
-
-const commentBtn = document.createElement("button");
-commentBtn.textContent = "إرسال التعليق";
-
-commentsBox.append(commentsTitle, commentsList, commentInput, commentBtn);
-card.append(commentsBox);
-
-// عرض التعليقات
-async function loadComments() {
-  const { data, error } = await db
-    .from("post_comments")
-    .select("*")
-    .eq("post_id", post.id)
-    .order("created_at", { ascending: true });
-
-  commentsList.innerHTML = "";
-
-  if (error) {
-    commentsList.textContent = "تعذر تحميل التعليقات";
-    return;
-  }
-
-  if (!data || data.length === 0) {
-    commentsList.textContent = "لا توجد تعليقات حتى الآن";
-    return;
-  }
-
-  data.forEach(comment => {
-    const item = document.createElement("p");
-    item.textContent =
-      (comment.user_name || "مستخدم") + ": " + comment.comment;
-    commentsList.append(item);
-  });
-}
-
-loadComments();
-
-// إرسال تعليق
-commentBtn.onclick = async () => {
-  const commentText = commentInput.value.trim();
-
-  if (!commentText) {
-    alert("اكتب التعليق أولاً");
-    return;
-  }
-
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
-    alert("سجل الدخول أولاً لإضافة تعليق");
-    return;
-  }
-
-  const { error } = await db
-    .from("post_comments")
-    .insert({
-      post_id: post.id,
-      user_id: user.id,
-      user_name: user.user_metadata?.full_name || "مستخدم دمياطي",
-      comment: commentText
-    });
-
-  if (error) {
-    alert("حصل خطأ أثناء إرسال التعليق: " + error.message);
-    return;
-  }
-
-  commentInput.value = "";
-  loadComments();
 };
 list.append(card);
  });

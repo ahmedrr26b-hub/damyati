@@ -42,7 +42,7 @@ button {
 <body>
 
 <div class="box">
-  <h2>صفحتي الشخصية</h2>
+  <h2>صفحتي الشخصية</h2>https://placehold.co/120x120?text=Photo
   <p id="message">جارٍ تحميل بيانات حسابك...</p>
 
   <div id="profile" hidden>
@@ -65,7 +65,56 @@ const SUPABASE_URL = "https://lytlefegtvcjgfvfbwnu.supabase.co";
 const SUPABASE_KEY = "sb_publishable_sIBXEfGZV73j0kDb27oykw_KsPcD0dk";
 
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+async function uploadAvatar() {
+  const { data: userData } = await db.auth.getUser();
+  const user = userData.user;
 
+  if (!user) {
+    alert("سجل الدخول أولاً");
+    return;
+  }
+
+  const file = document.getElementById("avatarFile").files[0];
+
+  if (!file) {
+    alert("اختار صورة أولاً");
+    return;
+  }
+
+  if (!file.type.startsWith("image/")) {
+    alert("اختار ملف صورة فقط");
+    return;
+  }
+
+  const path = user.id + "/" + Date.now() + ".jpg";
+
+  const { error } = await db.storage
+    .from("profile-images")
+    .upload(path, file);
+
+  if (error) {
+    alert("تعذر رفع الصورة: " + error.message);
+    return;
+  }
+
+  const { data } = db.storage
+    .from("profile-images")
+    .getPublicUrl(path);
+
+  const imageUrl = data.publicUrl;
+
+  const { error: updateError } = await db.auth.updateUser({
+    data: { avatar_url: imageUrl }
+  });
+
+  if (updateError) {
+    alert("تم رفع الصورة لكن تعذر حفظ بياناتها");
+    return;
+  }
+
+  document.getElementById("avatar").src = imageUrl;
+  alert("تم رفع صورة الحساب بنجاح");
+}
 async function loadProfile() {
   const { data, error } = await db.auth.getUser();
 
@@ -77,7 +126,9 @@ async function loadProfile() {
 
   const user = data.user;
   const info = user.user_metadata || {};
-
+if (info.avatar_url) {
+  document.getElementById("avatar").src = info.avatar_url;
+}
   document.getElementById("name").textContent =
     info.full_name || "غير مسجل";
 

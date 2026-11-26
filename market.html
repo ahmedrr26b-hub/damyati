@@ -193,6 +193,15 @@ async function loadPosts(){
    card.append(owner);
 
 const messageBtn = document.createElement("button");
+messageBtn.style.cssText = `
+  background:#ffffff;
+  color:#1769aa;
+  border:1px solid #1769aa;
+  padding:10px 22px;
+  border-radius:25px;
+  font-size:15px;
+  cursor:pointer;
+`;
 messageBtn.textContent = "💬 راسل صاحب المنشور";
 messageBtn.onclick = () => {
   window.location.href = "messages.html?to=" + encodeURIComponent(post.user_id);
@@ -226,9 +235,26 @@ messageBtn.onclick = () => {
 
    // قسم الإعجابات
 const likesBox = document.createElement("div");
-
+likesBox.style.cssText = `
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#eaf3ff;
+  padding:12px;
+  border-radius:12px;
+  margin-top:12px;
+  gap:10px;
+`;
 const likeBtn = document.createElement("button");
-likeBtn.textContent = "❤️ إعجاب";
+likeBtn.style.cssText = `
+  background:#1769aa;
+  color:white;
+  border:none;
+  padding:10px 22px;
+  border-radius:25px;
+  font-size:15px;
+  cursor:pointer;
+`;
 
 const likesCount = document.createElement("span");
 likesCount.textContent = " جاري تحميل الإعجابات... ";
@@ -240,9 +266,13 @@ card.append(messageBtn);
 const { count } = await db
   .from("post_likes")
   .select("*", { count: "exact", head: true })
-  .eq("post_id", post.id);
-
+  .eq("post_id", post.id)
 likesCount.textContent = " " + (count || 0) + " إعجاب";
+likesCount.style.cssText = `
+  color:#1769aa;
+  font-weight:bold;
+  font-size:14px;
+`; 
 
 likeBtn.onclick = async () => {
   const { data: { user } } = await db.auth.getUser();

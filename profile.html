@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>صفحتي الشخصية - دمياطي</title>
+<style>
+body {
+  font-family: Arial;
+  background: #eef4fb;
+  margin: 0;
+  padding: 20px;
+}
+.box {
+  background: white;
+  max-width: 450px;
+  margin: 30px auto;
+  padding: 25px;
+  border-radius: 15px;
+  text-align: center;
+}
+h2 { color: #1261a0; }
+.info {
+  background: #f2f6fa;
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 8px;
+  text-align: right;
+}
+button {
+  background: #1261a0;
+  color: white;
+  border: 0;
+  padding: 13px;
+  width: 100%;
+  border-radius: 8px;
+  margin-top: 12px;
+  font-size: 16px;
+}
+</style>
+</head>
+<body>
+
+<div class="box">
+  <h2>صفحتي الشخصية</h2>
+  <p id="message">جارٍ تحميل بيانات حسابك...</p>
+
+  <div id="profile" hidden>
+    <div class="info">الاسم: <span id="name"></span></div>
+    <div class="info">البريد الإلكتروني: <span id="email"></span></div>
+    <div class="info">رقم الهاتف: <span id="phone"></span></div>
+    <div class="info">نوع الحساب: <span id="type"></span></div>
+    <div class="info" id="showroomRow" hidden>
+      اسم المعرض: <span id="showroom"></span>
+    </div>
+
+    <button onclick="logout()">تسجيل الخروج</button>
+    <button onclick="location.href='market.html'">العودة إلى السوق</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = "https://lytlefegtvcjgfvfbwnu.supabase.co";
+const SUPABASE_KEY = "sb_publishable_sIBXEfGZV73j0kDb27oykw_KsPcD0dk";
+
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+async function loadProfile() {
+  const { data, error } = await db.auth.getUser();
+
+  if (error || !data.user) {
+    document.getElementById("message").textContent =
+      "يرجى تسجيل الدخول أولاً";
+    return;
+  }
+
+  const user = data.user;
+  const info = user.user_metadata || {};
+
+  document.getElementById("name").textContent =
+    info.full_name || "غير مسجل";
+
+  document.getElementById("email").textContent = user.email || "";
+  document.getElementById("phone").textContent =
+    info.phone || "غير مسجل";
+
+  document.getElementById("type").textContent =
+    info.account_type === "business" ? "معرض" : "عميل";
+
+  if (info.showroom_name) {
+    document.getElementById("showroom").textContent =
+      info.showroom_name;
+    document.getElementById("showroomRow").hidden = false;
+  }
+
+  document.getElementById("message").textContent = "";
+  document.getElementById("profile").hidden = false;
+}
+
+async function logout() {
+  const { error } = await db.auth.signOut();
+
+  if (error) {
+    alert("تعذر تسجيل الخروج");
+    return;
+  }
+
+  location.href = "login.html";
+}
+
+loadProfile();
+</script>
+
+</body>
+</html>

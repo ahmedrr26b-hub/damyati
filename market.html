@@ -1,69 +1,31 @@
- 
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>دمياطي | سوق الأثاث</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#f0f2f5;font-family:Arial,sans-serif;color:#222}
-header{background:#1264a3;color:white;padding:18px;text-align:center}
-header h1{margin:0;font-size:28px}
-header p{margin:7px 0 0}
-nav{background:white;padding:13px;text-align:center;box-shadow:0 2px 5px #ddd}
-nav a{color:#1264a3;text-decoration:none;margin:0 9px;font-weight:bold}
+body{margin:0;background:#f0f2f5;font-family:Arial;color:#222}
+header{background:#1264a3;color:white;padding:20px;text-align:center}
+nav{background:white;padding:14px;text-align:center}
+nav a{color:#1264a3;text-decoration:none;margin:8px;font-weight:bold}
 .container{max-width:650px;margin:20px auto;padding:0 12px}
-.welcome{background:#1264a3;color:white;padding:20px;border-radius:12px;text-align:center}
-.welcome h2{margin-top:0}
-.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:15px 0}
-.actions button{padding:15px;border:0;border-radius:10px;background:white;color:#1264a3;font-size:16px;font-weight:bold}
-.card{background:white;padding:16px;border-radius:12px;margin:14px 0;box-shadow:0 2px 6px #ddd}
-.card h3{color:#1264a3;margin-top:0}
-.post-image{background:#e8f1f8;border-radius:10px;padding:25px;text-align:center;font-size:55px;margin:12px 0}
+.card,.post{background:white;padding:16px;border-radius:12px;margin:14px 0;box-shadow:0 2px 6px #ddd}
+h2,h3{color:#1264a3}
+input,textarea,select{width:100%;padding:12px;margin:8px 0;border:1px solid #ccc;border-radius:8px;font-size:16px}
+button{background:#1264a3;color:white;border:0;padding:13px;border-radius:8px;font-size:16px;cursor:pointer}
+button:disabled{opacity:.5}
+.owner{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.owner img{width:42px;height:42px;border-radius:50%;object-fit:cover}
+.product{width:100%;max-height:350px;object-fit:contain;border-radius:10px}
 .small{color:#777;font-size:13px}
-button{cursor:pointer}
-.footer{text-align:center;padding:25px;color:#777}
 </style>
 </head>
 <body>
-<script>
-const SUPABASE_URL
-="https://lytlefegtvcjgfvfbwnu.supabase.co";
-const SUPABASE_KEY
-="sb_publishable_sIBXEfGZV73j0kDb27oykw_KsPcD0dk";
 
-const db = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
-);
-
-async function showUserInfo() {
-  const { data } = await db.auth.getUser();
-  const user = data.user;
-
-  if (!user) return;
-
-  const info = user.user_metadata || {};
-  const name = info.full_name || "مستخدم دمياطي";
-  const avatar = info.avatar_url || "https://placehold.co/50x50?text=User";
-
-  document.querySelectorAll(".card").forEach(card => {
-    const header = card.querySelector("h3");
-    if (!header) return;
-
-    const userInfo = document.createElement("p");
-    userInfo.innerHTML = `
-      <img src="${avatar}" style="width:40px;height:40px;border-radius:50%;vertical-align:middle">
-      <strong>${name}</strong>
-    `;
-    header.after(userInfo);
-  });
-}
-
-showUserInfo();
-</script>
 <header>
 <h1>دمياطي DAMYATI</h1>
 <p>سوق الأثاث المصري يجمعنا</p>
@@ -72,25 +34,195 @@ showUserInfo();
 <nav>
 <a href="index.html">الرئيسية</a>
 <a href="market.html">السوق</a>
+<a href="profile.html">صفحتي الشخصية</a>
 <a href="register.html">تسجيل معرض</a>
 </nav>
-<a href="profile.html">صفحتي الشخصية</a>
+
 <div class="container">
 
-<div class="welcome">
+<div class="card">
 <h2>أهلاً بك في دمياطي</h2>
-<p>بيع وشراء الأثاث.. تواصل مع المعارض والعملاء في مكان واحد</p>
+<p>بيع وشراء الأثاث في مكان واحد.</p>
 </div>
 
-<div class="actions">
-<button onclick="alert('سيتم تفعيل نشر طلبك بعد تجهيز التسجيل')">📝 اطلب أثاثك</button>
-<button onclick="alert('سيتم تفعيل إضافة المنتجات للمعارض المعتمدة')">🛋️ اعرض أثاثك</button>
+<div class="card">
+<h3>📝 أضف منشورًا جديدًا</h3>
+<p id="loginMessage"></p>
+
+<form id="postForm">
+<label>نوع المنشور</label>
+<select id="postType" required>
+<option value="عرض أثاث">عرض أثاث</option>
+<option value="طلب شراء">طلب شراء</option>
+</select>
+
+<label>عنوان المنشور</label>
+<input id="title" required placeholder="مثال: غرفة نوم مودرن">
+
+<label>وصف المنشور</label>
+<textarea id="description" rows="4" placeholder="اكتب التفاصيل"></textarea>
+
+<label>السعر بالجنيه (اختياري)</label>
+<input id="price" type="number" min="0" placeholder="السعر">
+
+<label>صورة الأثاث (اختياري)</label>
+<input id="photo" type="file" accept="image/*">
+
+<button type="submit" id="publishButton">نشر المنشور</button>
+<p id="status"></p>
+</form>
 </div>
 
 <div class="card">
 <h3>📢 أحدث المنشورات</h3>
-<p>هنا ستظهر منشورات العملاء والمعارض في مكان واحد.</p>
-<p class="small">منصة دمياطي تجمع الجميع</p>
+<div id="postsList">جارٍ تحميل المنشورات...</div>
 </div>
 
-<div class="card
+</div>
+
+<script>
+const SUPABASE_URL = "https://lytlefegtvcjgfvfbwnu.supabase.co";
+const SUPABASE_KEY = "sb_publishable_sIBXEfGZV73j0kDb27oykw_KsPcD0dk";
+
+const db = window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let currentUser = null;
+
+async function init(){
+ const result = await db.auth.getUser();
+ currentUser = result.data.user;
+
+ if(!currentUser){
+   document.getElementById("loginMessage").innerHTML =
+   'يجب تسجيل الدخول أولاً <a href="login.html">تسجيل الدخول</a>';
+   document.getElementById("postForm").style.display = "none";
+ }else{
+   document.getElementById("loginMessage").textContent =
+   "أنت مسجل الدخول ويمكنك النشر.";
+ }
+
+ await loadPosts();
+}
+
+document.getElementById("postForm").addEventListener("submit",async function(e){
+ e.preventDefault();
+
+ if(!currentUser){
+   alert("سجل الدخول أولاً");
+   return;
+ }
+
+ const status = document.getElementById("status");
+ const button = document.getElementById("publishButton");
+ button.disabled = true;
+ status.textContent = "جارٍ نشر المنشور...";
+
+ try{
+   let imageUrl = null;
+   const file = document.getElementById("photo").files[0];
+
+   if(file){
+     const ext = file.name.split(".").pop();
+     const fileName = currentUser.id + "/" + Date.now() + "." + ext;
+
+     const upload = await db.storage.from("post-images").upload(fileName,file);
+     if(upload.error) throw upload.error;
+
+     imageUrl = db.storage.from("post-images").getPublicUrl(fileName).data.publicUrl;
+   }
+
+   const info = currentUser.user_metadata || {};
+
+   const post = {
+     user_id: currentUser.id,
+     user_name: info.full_name || "مستخدم دمياطي",
+     user_avatar: info.avatar_url || null,
+     title: document.getElementById("title").value,
+     description: document.getElementById("description").value,
+     price: document.getElementById("price").value || null,
+     post_type: document.getElementById("postType").value,
+     image_url: imageUrl
+   };
+
+   const saved = await db.from("posts").insert(post);
+   if(saved.error) throw saved.error;
+
+   status.textContent = "تم نشر المنشور بنجاح";
+   this.reset();
+   await loadPosts();
+
+ }catch(error){
+   status.textContent = "حدث خطأ: " + error.message;
+ }finally{
+   button.disabled = false;
+ }
+});
+
+async function loadPosts(){
+ const list = document.getElementById("postsList");
+
+ const result = await db.from("posts")
+   .select("*")
+   .order("created_at",{ascending:false});
+
+ if(result.error){
+   list.textContent = "تعذر تحميل المنشورات: " + result.error.message;
+   return;
+ }
+
+ if(!result.data.length){
+   list.textContent = "لا توجد منشورات حتى الآن.";
+   return;
+ }
+
+ list.innerHTML = "";
+
+ result.data.forEach(post=>{
+   const card = document.createElement("div");
+   card.className = "post";
+
+   const owner = document.createElement("div");
+   owner.className = "owner";
+
+   const avatar = document.createElement("img");
+   avatar.src = post.user_avatar || "https://placehold.co/50x50?text=User";
+
+   const name = document.createElement("strong");
+   name.textContent = post.user_name || "مستخدم دمياطي";
+
+   owner.append(avatar,name);
+   card.append(owner);
+
+   const type = document.createElement("p");
+   type.className = "small";
+   type.textContent = post.post_type || "";
+   card.append(type);
+
+   const title = document.createElement("h3");
+   title.textContent = post.title;
+   card.append(title);
+
+   const description = document.createElement("p");
+   description.textContent = post.description || "";
+   card.append(description);
+
+   if(post.image_url){
+     const image = document.createElement("img");
+     image.className = "product";
+     image.src = post.image_url;
+     card.append(image);
+   }
+
+   if(post.price){
+     const price = document.createElement("strong");
+     price.textContent = "السعر: " + post.price + " جنيه";
+     card.append(price);
+   }
+
+   list.append(card);
+ });
+}
+
+init();
+</script>
+</body>
+</html>

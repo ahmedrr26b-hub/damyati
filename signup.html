@@ -4,19 +4,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>إنشاء حساب | دمياطي</title>
+<title>التسجيل في دمياطي</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#edf3f9;font-family:Arial;color:#222}
 header{background:#105b96;color:white;text-align:center;padding:22px}
-header h1{margin:0}
 .container{max-width:520px;margin:25px auto;padding:15px}
 .card{background:white;padding:23px;border-radius:14px;box-shadow:0 3px 12px #ddd}
 h2{color:#105b96;text-align:center}
 label{display:block;margin-top:15px;font-weight:bold}
 input,select{width:100%;padding:12px;margin-top:7px;border:1px solid #ccc;border-radius:8px;font-size:16px}
 button{width:100%;padding:14px;margin-top:20px;border:0;border-radius:9px;background:#1269a8;color:white;font-size:17px;font-weight:bold}
-.note{background:#e8f2fa;padding:12px;border-radius:8px;margin-top:15px;font-size:14px}
+#message{margin-top:15px;padding:12px;border-radius:8px;display:none}
 </style>
 </head>
 <body>
@@ -29,25 +28,29 @@ button{width:100%;padding:14px;margin-top:20px;border:0;border-radius:9px;backgr
 <div class="card">
 <h2>إنشاء حساب جديد</h2>
 
+<form id="signupForm">
 <label>نوع الحساب</label>
-<select id="accountType" onchange="changeType()">
+<select id="accountType">
 <option value="customer">حساب شخصي - عميل</option>
 <option value="showroom">حساب تجاري - معرض أثاث</option>
 </select>
 
 <label>الاسم</label>
-<input type="text" placeholder="اكتب اسمك">
+<input id="name" required placeholder="اكتب اسمك">
+
+<label>البريد الإلكتروني</label>
+<input id="email" type="email" required placeholder="example@email.com">
 
 <label>رقم الهاتف</label>
-<input type="tel" placeholder="01xxxxxxxxx">
+<input id="phone" type="tel" required placeholder="01xxxxxxxxx">
 
 <div id="showroomFields" style="display:none">
 <label>اسم المعرض</label>
-<input type="text" placeholder="اسم المعرض">
+<input id="showroomName" placeholder="اسم المعرض">
 
 <label>المحافظة</label>
-<select>
-<option>اختر المحافظة</option>
+<select id="governorate">
+<option value="">اختر المحافظة</option>
 <option>دمياط</option>
 <option>الدقهلية</option>
 <option>القاهرة</option>
@@ -57,22 +60,82 @@ button{width:100%;padding:14px;margin-top:20px;border:0;border-radius:9px;backgr
 </div>
 
 <label>كلمة المرور</label>
-<input type="password" placeholder="كلمة المرور">
+<input id="password" type="password" minlength="8" required placeholder="8 أحرف على الأقل">
 
-<button onclick="alert('هذه استمارة تجريبية، وسيتم تفعيل التسجيل الحقيقي لاحقاً')">إنشاء الحساب</button>
+<button id="submitBtn" type="submit">إنشاء الحساب</button>
+</form>
 
-<div class="note">
-التسجيل في هذه المرحلة تجريبي، ولا يتم حفظ البيانات أو إنشاء حساب حقيقي حتى الآن.
+<div id="message"></div>
 </div>
 </div>
-</div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-function changeType(){
-const type=document.getElementById('accountType').value;
-document.getElementById('showroomFields').style.display=
-type==='showroom'?'block':'none';
-}
+const SUPABASE_URL = "https://lytlefegtvcjgfvfbwnu.supabase.co/rest/v1/ ";
+const SUPABASE_KEY = "sb_publishable_sIBXEfGZV73j0kDb27oykw_KsPcD0dk ";
+
+const db = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+const type = document.getElementById("accountType");
+const fields = document.getElementById("showroomFields");
+
+type.addEventListener("change", function(){
+  fields.style.display =
+    type.value === "showroom" ? "block" : "none";
+});
+
+document.getElementById("signupForm").addEventListener("submit", async function(e){
+  e.preventDefault();
+
+  const btn = document.getElementById("submitBtn");
+  const msg = document.getElementById("message");
+
+  const accountType = type.value;
+  const showroomName = document.getElementById("showroomName").value.trim();
+  const governorate = document.getElementById("governorate").value;
+
+  if(accountType === "showroom" && (!showroomName || !governorate)){
+    msg.style.display = "block";
+    msg.textContent = "من فضلك أكمل بيانات المعرض والمحافظة";
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = "جارٍ إنشاء الحساب...";
+  msg.style.display = "block";
+  msg.textContent = "جارٍ التسجيل...";
+
+  const { data, error } = await db.auth.signUp({
+    email: document.getElementById("email").value.trim(),
+    password: document.getElementById("password").value,
+    options: {
+      data: {
+        full_name: document.getElementById("name").value.trim(),
+        phone: document.getElementById("phone").value.trim(),
+        account_type: accountType,
+        showroom_name: showroomName,
+        governorate: governorate
+      }
+    }
+  });
+
+  if(error){
+    msg.textContent = "تعذر التسجيل: " + error.message;
+  } else {
+    msg.textContent = data.session
+      ? "تم إنشاء الحساب بنجاح!"
+      : "تم إرسال رسالة تأكيد إلى بريدك الإلكتروني. افتحها لتأكيد الحساب.";
+    document.getElementById("signupForm").reset();
+    fields.style.display = "none";
+  }
+
+  btn.disabled = false;
+  btn.textContent = "إنشاء الحساب";
+});
 </script>
 </body>
 </html>
+ 

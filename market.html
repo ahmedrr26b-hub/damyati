@@ -176,7 +176,7 @@ async function loadPosts(){
 
  list.innerHTML = "";
 
- result.data.forEach(post=>{
+ result.data.forEach(async post=>{
    const card = document.createElement("div");
    card.className = "post";
 

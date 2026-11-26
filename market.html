@@ -238,7 +238,7 @@ likesBox.append(likeBtn, likesCount);
 card.append(likesBox);
 
 // جلب عدد الإعجابات
-const { count } = await supabase
+const { count } = await db
   .from("post_likes")
   .select("*", { count: "exact", head: true })
   .eq("post_id", post.id);
@@ -246,14 +246,14 @@ const { count } = await supabase
 likesCount.textContent = " " + (count || 0) + " إعجاب";
 
 likeBtn.onclick = async () => {
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user } } = await db.auth.getUser();
 
   if (!user) {
     alert("سجل الدخول أولاً للإعجاب");
     return;
   }
 
-  const { data: existing } = await supabase
+  const { data: existing } = await db
     .from("post_likes")
     .select("id")
     .eq("post_id", post.id)
@@ -261,15 +261,15 @@ likeBtn.onclick = async () => {
     .maybeSingle();
 
   if (existing) {
-    await supabase.from("post_likes").delete().eq("id", existing.id);
+    await db.from("post_likes").delete().eq("id", existing.id);
   } else {
-    await supabase.from("post_likes").insert({
+    await db.from("post_likes").insert({
       post_id: post.id,
       user_id: user.id
     });
   }
 
-  const { count: newCount } = await supabase
+  const { count: newCount } = await db
     .from("post_likes")
     .select("*", { count: "exact", head: true })
     .eq("post_id", post.id);
@@ -296,7 +296,7 @@ card.append(commentsBox);
 
 // عرض التعليقات
 async function loadComments() {
-  const { data, error } = await supabase
+  const { data, error } = await db
     .from("post_comments")
     .select("*")
     .eq("post_id", post.id)
@@ -340,7 +340,7 @@ commentBtn.onclick = async () => {
     return;
   }
 
-  const { error } = await supabase
+  const { error } = await db
     .from("post_comments")
     .insert({
       post_id: post.id,

@@ -192,6 +192,13 @@ async function loadPosts(){
    owner.append(avatar,name);
    card.append(owner);
 
+const messageBtn = document.createElement("button");
+messageBtn.textContent = "💬 راسل صاحب المنشور";
+messageBtn.onclick = () => {
+  window.location.href = "messages.html?to=" + encodeURIComponent(post.user_id);
+};
+card.append(messageBtn);
+
    const type = document.createElement("p");
    type.className = "small";
    type.textContent = post.post_type || "";

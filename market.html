@@ -1,4 +1,4 @@
-
+ 
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -27,7 +27,40 @@ button{cursor:pointer}
 </style>
 </head>
 <body>
+<script>
+const SUPABASE_URL = "ضع رابط مشروعك هنا";
+const SUPABASE_KEY = "ضع مفتاح النشر هنا";
 
+const db = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+async function showUserInfo() {
+  const { data } = await db.auth.getUser();
+  const user = data.user;
+
+  if (!user) return;
+
+  const info = user.user_metadata || {};
+  const name = info.full_name || "مستخدم دمياطي";
+  const avatar = info.avatar_url || "https://placehold.co/50x50?text=User";
+
+  document.querySelectorAll(".card").forEach(card => {
+    const header = card.querySelector("h3");
+    if (!header) return;
+
+    const userInfo = document.createElement("p");
+    userInfo.innerHTML = `
+      <img src="${avatar}" style="width:40px;height:40px;border-radius:50%;vertical-align:middle">
+      <strong>${name}</strong>
+    `;
+    header.after(userInfo);
+  });
+}
+
+showUserInfo();
+</script>
 <header>
 <h1>دمياطي DAMYATI</h1>
 <p>سوق الأثاث المصري يجمعنا</p>
@@ -57,32 +90,4 @@ button{cursor:pointer}
 <p class="small">منصة دمياطي تجمع الجميع</p>
 </div>
 
-<div class="card">
-<h3>🛏️ معرض غرف النوم</h3>
-<div class="post-image">🛏️</div>
-<p>غرف نوم مودرن بتصميمات عصرية.</p>
-<p class="small">منشور تجريبي - معرض أثاث</p>
-</div>
-
-<div class="card">
-<h3>🛋️ طلب عميل</h3>
-<div class="post-image">🛋️</div>
-<p>مطلوب انتريه مودرن بلون هادئ.</p>
-<p class="small">منشور تجريبي - عميل</p>
-</div>
-
-<div class="card">
-<h3>🍽️ سفرة مودرن</h3>
-<div class="post-image">🍽️</div>
-<p>أفكار وتصميمات للسفرات العصرية.</p>
-<p class="small">منشور تجريبي - معرض أثاث</p>
-</div>
-
-</div>
-
-<div class="footer">
-دمياطي DAMYATI © 2026
-</div>
-
-</body>
-</html>
+<div class="card

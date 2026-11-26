@@ -63,7 +63,12 @@ button {
 
     <button onclick="logout()">تسجيل الخروج</button>
     <button onclick="location.href='market.html'">العودة إلى السوق</button>
-  </div>
+<hr style="margin:25px 0">
+
+<h2>📦 منشوراتي</h2>
+
+<div id="myPosts">
+  جارٍ تحميل منشوراتك...
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -167,7 +172,68 @@ async function logout() {
   location.href = "login.html";
 }
 
+async function loadMyPosts() {
+  const box = document.getElementById("myPosts");
+
+  const { data: userData } = await db.auth.getUser();
+  const user = userData.user;
+
+  if (!user) {
+    box.textContent = "سجل الدخول لعرض منشوراتك";
+    return;
+  }
+
+  const { data, error } = await db
+    .from("posts")
+    .select("*")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    box.textContent = "تعذر تحميل المنشورات: " + error.message;
+    return;
+  }
+
+  box.innerHTML = "";
+
+  if (!data || data.length === 0) {
+    box.textContent = "لم تنشر أي منشورات حتى الآن";
+    return;
+  }
+
+  data.forEach(post => {
+    const item = document.createElement("div");
+    item.style.cssText =
+      "background:#f2f6fa;padding:15px;margin:12px 0;border-radius:10px;text-align:right";
+
+    const title = document.createElement("h3");
+    title.textContent = post.title;
+    item.append(title);
+
+    const description = document.createElement("p");
+    description.textContent = post.description || "";
+    item.append(description);
+
+    if (post.image_url) {
+      const img = document.createElement("img");
+      img.src = post.image_url;
+      img.style.cssText =
+        "width:100%;max-height:300px;object-fit:contain;border-radius:8px";
+      item.append(img);
+    }
+
+    if (post.price) {
+      const price = document.createElement("p");
+      price.textContent = "السعر: " + post.price + " جنيه";
+      item.append(price);
+    }
+
+    box.append(item);
+  });
+}
+
 loadProfile();
+loadMyPosts();
 </script>
 
 </body>

@@ -39,6 +39,18 @@ button{cursor:pointer}
 .bottom-nav{position:sticky;bottom:0;background:#fff;display:flex;justify-content:space-around;padding:11px 3px;box-shadow:0 -2px 8px #0001}
 .bottom-nav a{color:#1769aa;text-decoration:none;text-align:center;font-size:13px}
 @media(max-width:420px){.logo{font-size:19px}.search{padding:10px}}
+
+.modal-overlay{position:fixed;inset:0;background:#15253699;z-index:50;display:none;align-items:center;justify-content:center;padding:16px}
+.modal-overlay.show{display:flex}
+.modal-box{width:100%;max-width:520px;max-height:90vh;overflow:auto;background:#fff;border-radius:16px;padding:18px;box-shadow:0 12px 40px #0003}
+.modal-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+.modal-head h3{margin:0;color:#1769aa}
+.close-modal{border:0;background:#eef3f8;border-radius:50%;width:36px;height:36px;font-size:22px;color:#526273}
+.modal-actions{display:flex;gap:8px;margin-top:12px}
+.modal-actions button{flex:1}
+.danger{background:#b83232;color:#fff;border:0;border-radius:10px;padding:12px}
+.modal-note{color:#687787;font-size:13px;line-height:1.6}
+
 </style>
 </head>
 <body>
@@ -83,6 +95,46 @@ button{cursor:pointer}
   <h3 class="section-title">أحدث المنشورات</h3>
   <div id="status">جارٍ تحميل المنشورات...</div>
   <div id="posts"></div>
+
+<div class="modal-overlay" id="editModal" role="dialog" aria-modal="true" aria-labelledby="editModalTitle">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3 id="editModalTitle">تعديل المنشور</h3>
+      <button class="close-modal" type="button" onclick="closeEditModal()">×</button>
+    </div>
+    <label for="editTitle">عنوان المنشور</label>
+    <input id="editTitle" placeholder="عنوان المنشور (اختياري)">
+    <label for="editDescription">محتوى المنشور</label>
+    <textarea id="editDescription" placeholder="اكتب محتوى المنشور"></textarea>
+    <label for="editPrice">السعر بالجنيه</label>
+    <input id="editPrice" type="number" min="0" placeholder="السعر (اختياري)">
+    <label for="editType">نوع المنشور</label>
+    <select id="editType">
+      <option value="عام">منشور عام</option>
+      <option value="بيع">عرض منتج للبيع</option>
+      <option value="طلب">طلب شراء</option>
+    </select>
+    <div class="modal-actions">
+      <button class="primary" id="saveEditBtn" type="button" onclick="saveEditPost()">حفظ التعديلات</button>
+      <button class="secondary" type="button" onclick="closeEditModal()">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="deleteModal" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3 id="deleteModalTitle">تأكيد حذف المنشور</h3>
+      <button class="close-modal" type="button" onclick="closeDeleteModal()">×</button>
+    </div>
+    <p>هل أنت متأكد أنك تريد حذف هذا المنشور؟ لا يمكن التراجع بعد الحذف.</p>
+    <div class="modal-actions">
+      <button class="danger" id="confirmDeleteBtn" type="button" onclick="confirmDeletePost()">نعم، احذف المنشور</button>
+      <button class="secondary" type="button" onclick="closeDeleteModal()">إلغاء</button>
+    </div>
+  </div>
+</div>
+
 </main>
 
 <nav class="bottom-nav">
@@ -213,7 +265,7 @@ async function loadPosts() {
       <div class="post-actions">
         <button class="secondary" onclick="toggleLike(${Number(post.id)})">👍 ${likedByMe[post.id] ? "أعجبني" : "إعجاب"} (${likesMap[post.id] || 0})</button>
         <button class="secondary" onclick="sendMessage('${escapeHTML(post.user_id || "")}')">💬 رسالة</button>
-        ${owner ? `<button class="secondary" onclick="editPost(${Number(post.id)})">✏️ تعديل</button>
+        ${owner ? `<button class="secondary" onclick="openEditModal(${Number(post.id)})">✏️ تعديل</button>
         <button class="secondary" onclick="deletePost(${Number(post.id)})">🗑️ حذف</button>` : ""}
       </div>`;
     area.appendChild(article);
@@ -332,46 +384,103 @@ function sendMessage(userId) {
   location.href = "messages.html?to=" + encodeURIComponent(userId);
 }
 
-async function editPost(id) {
+let editingPostId = null;
+let deletingPostId = null;
+
+function openEditModal(id) {
   const post = allPosts.find(p => Number(p.id) === Number(id));
   if (!post || !currentUser || post.user_id !== currentUser.id) {
     alert("لا يمكنك تعديل هذا المنشور.");
     return;
   }
 
-  const newTitle = prompt("عنوان المنشور:", post.title || "");
-  if (newTitle === null) return;
-  const newDescription = prompt("محتوى المنشور:", post.description || "");
-  if (newDescription === null || !newDescription.trim()) return;
-  const newPrice = prompt("السعر بالجنيه (اتركه فارغًا إذا لا يوجد):", post.price ?? "");
-  if (newPrice === null) return;
-  if (newPrice.trim() && (!Number.isFinite(Number(newPrice)) || Number(newPrice) < 0)) {
-    alert("السعر غير صحيح.");
+  editingPostId = post.id;
+  document.getElementById("editTitle").value = post.title || "";
+  document.getElementById("editDescription").value = post.description || "";
+  document.getElementById("editPrice").value = post.price ?? "";
+  document.getElementById("editType").value = post.post_type || "عام";
+  document.getElementById("editModal").classList.add("show");
+}
+
+function closeEditModal() {
+  document.getElementById("editModal").classList.remove("show");
+  editingPostId = null;
+}
+
+async function saveEditPost() {
+  if (editingPostId === null || !currentUser) return;
+
+  const title = document.getElementById("editTitle").value.trim();
+  const description = document.getElementById("editDescription").value.trim();
+  const priceText = document.getElementById("editPrice").value.trim();
+  const postType = document.getElementById("editType").value;
+
+  if (!description) {
+    alert("اكتب محتوى المنشور أولاً.");
+    return;
+  }
+  if (priceText && (!Number.isFinite(Number(priceText)) || Number(priceText) < 0)) {
+    alert("اكتب سعرًا صحيحًا.");
     return;
   }
 
-  const { error } = await db.from("posts").update({
-    title: newTitle.trim() || null,
-    description: newDescription.trim(),
-    price: newPrice.trim() ? Number(newPrice) : null
-  }).eq("id", id).eq("user_id", currentUser.id);
+  const button = document.getElementById("saveEditBtn");
+  button.disabled = true;
+  button.textContent = "جارٍ الحفظ...";
 
-  if (error) alert("تعذر تعديل المنشور: " + error.message);
-  else {
-    alert("تم تعديل المنشور.");
-    await loadPosts();
+  const { error } = await db.from("posts").update({
+    title: title || null,
+    description: description,
+    price: priceText ? Number(priceText) : null,
+    post_type: postType
+  }).eq("id", editingPostId).eq("user_id", currentUser.id);
+
+  button.disabled = false;
+  button.textContent = "حفظ التعديلات";
+
+  if (error) {
+    alert("تعذر تعديل المنشور: " + error.message);
+    return;
   }
+
+  closeEditModal();
+  await loadPosts();
 }
 
-async function deletePost(id) {
-  if (!currentUser || !confirm("هل أنت متأكد من حذف المنشور؟")) return;
+function deletePost(id) {
+  const post = allPosts.find(p => Number(p.id) === Number(id));
+  if (!post || !currentUser || post.user_id !== currentUser.id) {
+    alert("لا يمكنك حذف هذا المنشور.");
+    return;
+  }
+  deletingPostId = post.id;
+  document.getElementById("deleteModal").classList.add("show");
+}
+
+function closeDeleteModal() {
+  document.getElementById("deleteModal").classList.remove("show");
+  deletingPostId = null;
+}
+
+async function confirmDeletePost() {
+  if (deletingPostId === null || !currentUser) return;
+
+  const button = document.getElementById("confirmDeleteBtn");
+  button.disabled = true;
+  button.textContent = "جارٍ الحذف...";
+
   const { error } = await db.from("posts").delete()
-    .eq("id", id).eq("user_id", currentUser.id);
+    .eq("id", deletingPostId).eq("user_id", currentUser.id);
+
+  button.disabled = false;
+  button.textContent = "نعم، احذف المنشور";
+
   if (error) {
     alert("تعذر حذف المنشور: " + error.message);
     return;
   }
-  alert("تم حذف المنشور.");
+
+  closeDeleteModal();
   await loadPosts();
 }
 
@@ -380,6 +489,14 @@ document.getElementById("searchInput").addEventListener("input", event => {
   document.querySelectorAll("#posts .post").forEach(card => {
     card.style.display = card.dataset.search.includes(term) ? "" : "none";
   });
+});
+
+
+document.getElementById("editModal").addEventListener("click", event => {
+  if (event.target.id === "editModal") closeEditModal();
+});
+document.getElementById("deleteModal").addEventListener("click", event => {
+  if (event.target.id === "deleteModal") closeDeleteModal();
 });
 
 startPage();

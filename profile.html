@@ -1,347 +1,40 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>دمياطي | صفحتي الشخصية</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>مساحتي في دمياطي</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-*{box-sizing:border-box}
-body{margin:0;background:#eef3f7;color:#263445;font-family:Arial,sans-serif}
-button{cursor:pointer;font:inherit}
-.topbar{position:sticky;top:0;z-index:10;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;box-shadow:0 2px 9px #0001}
-.brand{font-size:23px;font-weight:bold;color:#1769aa}
-.top-actions{display:flex;gap:8px}
-.small-btn,.secondary{border:0;background:#e8f2fb;color:#1769aa;border-radius:10px;padding:10px 13px}
-.page{max-width:850px;margin:18px auto;padding:0 12px}
-.message{background:#fff;padding:12px;border-radius:12px;margin-bottom:12px;text-align:center;color:#667788}
-.profile-card,.panel,.post{background:#fff;border-radius:15px;box-shadow:0 2px 9px #0000000a;margin-bottom:15px;overflow:hidden}
-.cover{height:170px;background:linear-gradient(120deg,#104e7a,#1769aa 55%,#70b5d8);position:relative}
-.cover:after{content:"دمياطي • مجتمع الأثاث";position:absolute;bottom:17px;right:20px;color:#ffffffd9;font-size:19px;font-weight:bold}
-.profile-main{padding:0 20px 17px}
-.identity{display:flex;align-items:flex-end;gap:15px;margin-top:-55px;position:relative}
-.avatar-wrap{width:116px;height:116px;flex-shrink:0;position:relative}
-#avatar{width:116px;height:116px;border-radius:50%;border:5px solid #fff;object-fit:cover;background:#eaf3fb}
-#avatarFile{display:none}
-.camera{position:absolute;bottom:5px;left:4px;background:#1769aa;color:#fff;border:3px solid white;border-radius:50%;width:34px;height:34px;display:grid;place-items:center}
-.identity-info{flex:1;min-width:0;padding-bottom:5px}
-.name{font-size:23px;margin:0 0 6px;color:#20384c;overflow-wrap:anywhere}
-.sub,.muted,.post-date{color:#84919d;font-size:13px}
-.profile-buttons{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
-.primary{border:0;background:#1769aa;color:#fff;border-radius:10px;padding:11px 15px}
-.bio{line-height:1.7;margin:13px 0 5px}
-.stats{display:flex;gap:20px;color:#687787;font-size:14px;padding:10px 0 0}
-.stats b{color:#1769aa}
-.tabs{display:flex;border-top:1px solid #edf0f3;padding:0 12px;gap:5px}
-.tab{background:transparent;border:0;padding:14px 17px;color:#657786;border-bottom:3px solid transparent}
-.tab.active{color:#1769aa;border-bottom-color:#1769aa;font-weight:bold}
-.content-grid{display:grid;grid-template-columns:1fr;gap:14px}
-.panel{padding:16px}
-.panel h3{margin:0 0 14px;color:#1769aa}
-.info-row{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #f0f2f4;font-size:14px}
-.info-label{color:#84919d}
-.composer-trigger{width:100%;display:flex;align-items:center;gap:10px;background:transparent;border:0;padding:0 0 12px;text-align:right}
-.mini-avatar{width:42px;height:42px;border-radius:50%;object-fit:cover;background:#eaf3fb}
-.fake-input{flex:1;background:#f0f2f5;border-radius:24px;padding:13px 15px;color:#75818c}
-.composer-form{display:none;border-top:1px solid #edf0f3;padding-top:13px}
-.composer-form.open{display:block}
-textarea,input,select{width:100%;padding:12px;border:1px solid #dce4ec;border-radius:10px;font:15px Arial;margin:0 0 10px;outline-color:#398bc5}
-textarea{min-height:85px;resize:vertical}
-#preview,.post-images{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:9px 0}
-#preview img,.post-images img{width:100%;max-height:280px;object-fit:cover;border-radius:9px}
-.preview-item{position:relative}.preview-item button{position:absolute;top:5px;left:5px;border:0;border-radius:50%;background:#fff;color:#a22;width:28px;height:28px}
-.post{padding:15px}
-.post-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-.avatar{width:42px;height:42px;border-radius:50%;object-fit:cover;background:#eaf3fb}
-.post-name{font-weight:bold;color:#1769aa}
-.post-date{margin-top:4px}
-.post-menu-wrap{margin-inline-start:auto;position:relative}
-.menu-trigger{border:0;background:transparent;color:#657786;font-size:25px;padding:4px 10px;border-radius:50%}
-.post-menu{display:none;position:absolute;top:36px;left:0;z-index:5;background:#fff;min-width:150px;padding:6px;border-radius:12px;box-shadow:0 4px 18px #0002}
-.post-menu.open{display:block}
-.post-menu button{display:block;width:100%;border:0;background:#fff;text-align:right;padding:11px;border-radius:8px;color:#263445}
-.post-menu button:hover{background:#f0f4f8}
-.post-title{margin:8px 0;color:#263445}
-.post-text{line-height:1.8;white-space:pre-wrap;overflow-wrap:anywhere}
-.post-price{margin:9px 0;color:#1769aa;font-weight:bold}
-.post-type{font-size:12px;color:#84919d;margin-top:8px}
-.post-actions{display:flex;gap:8px;flex-wrap:nowrap;border-top:1px solid #edf0f3;margin-top:12px;padding-top:10px}
-.post-actions button{flex:1;min-width:0}
-.action-icon{font-size:17px;margin-left:5px}
-.empty,.loading{text-align:center;color:#84919d;padding:25px 10px}
-.hidden{display:none!important}
-.modal-overlay{position:fixed;inset:0;background:#15253699;z-index:50;display:none;align-items:center;justify-content:center;padding:16px}
-.modal-overlay.show{display:flex}
-.modal-box{width:100%;max-width:520px;max-height:90vh;overflow:auto;background:#fff;border-radius:16px;padding:18px}
-.modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.modal-head h3{margin:0;color:#1769aa}
-.close-modal{border:0;background:#eef3f8;border-radius:50%;width:36px;height:36px;font-size:22px}
-.modal-actions{display:flex;gap:8px;margin-top:12px}
-.modal-actions button{flex:1}
-.danger{background:#b83232;color:#fff;border:0;border-radius:10px;padding:12px}
-@media(max-width:520px){.cover{height:135px}.profile-main{padding:0 13px 14px}.identity{gap:10px}.avatar-wrap,#avatar{width:90px;height:90px}.identity{margin-top:-43px}.name{font-size:19px}.profile-buttons button{padding:9px;font-size:13px}.tab{padding:12px 11px;font-size:14px}}
-</style>
-</head>
+:root{--coffee:#9a6840;--coffee2:#704528;--brown:#50321f;--beige:#ead8bf;--cream:#fbf6ed;--line:#c9a77f;--gold:#b78b52;--muted:#826b56}*{box-sizing:border-box}body{margin:0;background:#f4eadb;color:var(--brown);font-family:Tahoma,Arial,sans-serif}.top{background:linear-gradient(110deg,#f8eddd,#dfc19b);border-bottom:5px double var(--gold);padding:15px 4%;display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap}.brand{font-size:30px;font-weight:bold;color:var(--coffee2);letter-spacing:1px}.brand small{display:block;font-size:12px;text-align:center;letter-spacing:2px}.nav{display:flex;gap:20px;flex-wrap:wrap}.nav a{color:var(--brown);text-decoration:none;font-weight:bold}.wrap{max-width:1250px;margin:22px auto;padding:0 14px;display:grid;grid-template-columns:245px minmax(0,1fr) 290px;gap:16px}.panel{background:linear-gradient(145deg,#fffaf2,#ead6ba);border:1px solid var(--line);border-radius:18px;box-shadow:0 5px 18px #68432318;position:relative;overflow:hidden}.ornament{border:2px solid #c9a77f;outline:1px solid #e9d7bd;outline-offset:-7px}.side{padding:20px 16px;text-align:center;align-self:start}.side h3{margin:5px 0 20px;color:var(--coffee2)}.side a{display:block;padding:12px;border-bottom:1px solid #ddc7a9;color:var(--brown);text-decoration:none;font-weight:bold}.side a:hover{background:#e6cfaf}.side .note{margin-top:22px;font-size:13px;color:var(--muted);line-height:1.8}.main{min-width:0}.hero{height:190px;border-radius:18px;background:linear-gradient(90deg,#57371fbb,#57371f55),url('https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1400&q=85') center/cover;display:flex;align-items:center;padding:28px;color:#fff;border:4px double #d3ad7c;box-shadow:0 5px 15px #68432320}.hero h1{font-size:34px;margin:0 0 10px}.hero p{font-size:17px;margin:0}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}.stat{padding:17px 8px;text-align:center}.stat b{display:block;font-size:25px;color:var(--coffee2)}.stat span{font-size:13px;color:var(--muted)}.section-title{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;border-bottom:1px solid #d8bd99;font-weight:bold}.gallery{padding:12px;display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.gallery img{width:100%;height:125px;object-fit:cover;border-radius:10px;border:2px solid #d5b68e}.profile{text-align:center;padding:22px 16px}.avatar{width:112px;height:112px;object-fit:cover;border-radius:24px;border:5px solid #d6b58a;background:#e4cfb1}.profile h2{margin:12px 0 4px}.profile p{color:var(--muted);font-size:14px}.tag{display:inline-block;background:#e1c59e;color:#674426;padding:6px 13px;border-radius:20px;font-size:12px;font-weight:bold}.details{text-align:right;background:#f5e7d3;padding:13px;border-radius:12px;line-height:2;font-size:13px;margin-top:16px}.btn{border:0;border-radius:12px;padding:11px 16px;background:linear-gradient(#a9784b,#784a2a);color:white;font-weight:bold;cursor:pointer;font-size:14px}.btn.light{background:#ead2b1;color:#603e25;border:1px solid #c49b6d}.btnrow{display:flex;gap:8px;flex-wrap:wrap}.composer{padding:16px;margin:14px 0}.composer h3{margin:0 0 12px}.field{width:100%;padding:12px;border:1px solid #d4b894;border-radius:10px;background:#fffaf4;margin:5px 0;color:var(--brown);font:inherit}.post{padding:16px;margin:13px 0}.posthead{display:flex;align-items:center;gap:10px}.mini{width:42px;height:42px;border-radius:12px;object-fit:cover;background:#e4cfb1}.posthead strong{display:block}.posthead small{color:var(--muted)}.post h3{margin:12px 0 5px}.post p{line-height:1.8;white-space:pre-wrap}.postimgs{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}.postimgs img{width:100%;max-height:300px;object-fit:cover;border-radius:10px}.actions{display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid #e0c9a8;padding-top:12px;margin-top:12px}.actions button{flex:1;min-width:90px}.empty{text-align:center;padding:30px;color:var(--muted)}.hidden{display:none!important}#status{margin:10px 0;color:var(--coffee2);font-size:14px}.foot{padding:17px;text-align:center;color:var(--muted);font-size:12px}@media(max-width:900px){.wrap{grid-template-columns:1fr 260px}.main{grid-column:1/-1;grid-row:1}.profile{grid-column:2;grid-row:2}.side{grid-column:1;grid-row:2}}@media(max-width:600px){.wrap{display:flex;flex-direction:column}.hero{height:155px}.hero h1{font-size:25px}.gallery img{height:95px}.nav{gap:12px}.brand{font-size:25px}.stats{gap:6px}.stat{padding:12px 4px}}
+</style></head>
 <body>
-<header class="topbar">
-  <div class="brand">دمياطي</div>
-  <div class="top-actions">
-    <button class="small-btn" onclick="location.href='index.html'">الرئيسية</button>
-    <button class="small-btn" onclick="location.href='messages.html'">الرسائل</button>
-  </div>
-</header>
-<main class="page">
-  <div id="message" class="message">جارٍ تحميل بيانات الحساب...</div>
-  <section class="profile-card">
-    <div class="cover"></div>
-    <div class="profile-main">
-      <div class="identity">
-        <div class="avatar-wrap">
-          <img id="avatar" src="https://placehold.co/300x300/e8f1f8/1769aa?text=D" alt="الصورة الشخصية">
-          <label class="camera" for="avatarFile">📷</label>
-          <input type="file" id="avatarFile" accept="image/*">
-        </div>
-        <div class="identity-info">
-          <h1 class="name" id="name">جارٍ التحميل...</h1>
-          <div class="sub" id="accountLine">عضو في دمياطي</div>
-          <div class="profile-buttons">
-            <button class="primary" id="uploadButton" onclick="uploadAvatar()">حفظ الصورة</button>
-            <button class="secondary" onclick="location.href='index.html'">الرئيسية</button>
-          </div>
-        </div>
-      </div>
-      <p class="bio" id="bio"></p>
-      <div class="stats"><span><b id="postCount">0</b> منشور</span><span>مجتمع الأثاث في دمياط</span></div>
-    </div>
-    <nav class="tabs">
-      <button class="tab active" onclick="showTab('posts',this)">المنشورات</button>
-      <button class="tab" onclick="showTab('photos',this)">الصور</button>
-      <button class="tab" onclick="showTab('about',this)">حول الحساب</button>
-    </nav>
-  </section>
-
-  <section class="panel" id="aboutPanel">
-    <h3>معلومات الحساب</h3>
-    <div class="info-row"><span class="info-label">الاسم</span><span id="aboutName">—</span></div>
-    <div class="info-row"><span class="info-label">نوع الحساب</span><span id="type">—</span></div>
-    <div class="info-row" id="showroomRow" hidden><span class="info-label">اسم المعرض</span><span id="showroom"></span></div>
-    <div class="info-row"><span class="info-label">المحافظة</span><span id="governorate">غير مسجلة</span></div>
-    <button class="secondary" style="width:100%;margin-top:14px" onclick="logout()">تسجيل الخروج</button>
-  </section>
-
-  <section class="panel" id="postsPanel">
-    <h3 id="postsHeading">منشوراتي</h3>
-    <button type="button" class="composer-trigger" onclick="toggleComposer()">
-      <img class="mini-avatar" id="composerAvatar" src="https://placehold.co/100x100?text=D" alt="">
-      <span class="fake-input">بماذا تفكر؟ اضغط لكتابة منشور...</span>
-    </button>
-    <div class="composer-form" id="composerForm">
-      <textarea id="description" placeholder="اكتب منشورك هنا..."></textarea>
-      <input id="title" placeholder="عنوان المنشور (اختياري)">
-      <input id="price" type="number" min="0" placeholder="السعر بالجنيه (اختياري)">
-      <select id="postType"><option value="عام">منشور عام</option><option value="بيع">عرض منتج للبيع</option><option value="طلب">طلب شراء</option></select>
-      <label for="images">إضافة صور (يمكن اختيار أكثر من صورة)</label>
-      <input id="images" type="file" accept="image/*" multiple>
-      <div id="preview"></div>
-      <div class="modal-actions">
-        <button class="primary" id="publishBtn" onclick="createPost()">نشر المنشور</button>
-        <button class="secondary" onclick="toggleComposer(false)">إلغاء</button>
-      </div>
-    </div>
-    <div id="myPosts" class="loading">جارٍ تحميل منشوراتك...</div>
-  </section>
+<header class="top"><div class="brand">دمياطي <small>DAMYATI · مجتمع الأثاث الدمياطي</small></div><nav class="nav"><a href="index.html">الرئيسية</a><a href="market.html">السوق</a><a href="messages.html">الرسائل</a><a href="#" onclick="logout()">خروج</a></nav></header>
+<div class="wrap">
+<aside class="panel ornament side"><h3>مساحتي في دمياطي</h3><a href="#myPosts">منشوراتي</a><a href="#myGallery">معرض أعمالي</a><a href="#about">بياناتي</a><a href="messages.html">رسائلي</a><div class="note">✦ ✧ ✦<br>أصالة دمياط.. وفخامة التفاصيل<br>✦ ✧ ✦</div></aside>
+<main class="main">
+<section class="hero"><div><h1>أهلاً بك في مساحتك</h1><p>اعرض أعمالك وتواصل مع مجتمع الأثاث الدمياطي</p></div></section>
+<div class="stats"><div class="panel stat"><b id="postCount">0</b><span>منشور</span></div><div class="panel stat"><b id="photoCount">0</b><span>صورة عمل</span></div><div class="panel stat"><b id="likeCount">0</b><span>إعجاب</span></div></div>
+<section class="panel ornament" id="myGallery"><div class="section-title"><span>✧ معرض أعمالي ✧</span><span style="font-size:12px;color:#826b56">أحدث الصور والمنتجات</span></div><div class="gallery" id="gallery"><div class="empty">ستظهر صور منشوراتك هنا</div></div></section>
+<section class="panel ornament composer"><h3>✧ أضف جديدًا إلى مساحتك ✧</h3><input id="postTitle" class="field" placeholder="عنوان المنشور (اختياري)"><textarea id="postText" class="field" rows="3" placeholder="اكتب ما تريد مشاركته..."></textarea><div class="btnrow"><input id="postPrice" class="field" style="flex:1;min-width:130px" placeholder="السعر (اختياري)"><input id="postImages" type="file" accept="image/*" multiple class="field" style="flex:2;min-width:180px"></div><div class="btnrow"><button class="btn" onclick="createPost()">نشر المنشور</button><button class="btn light" onclick="clearComposer()">إلغاء</button></div><div id="status"></div></section>
+<section id="myPosts"><div class="section-title"><span>✧ نشاطي في دمياطي ✧</span><span style="font-size:12px;color:#826b56">منشوراتي وتفاعلات الأعضاء</span></div><div id="posts"><div class="empty">جارٍ تحميل المنشورات...</div></div></section>
 </main>
-
-<div class="modal-overlay" id="editModal" role="dialog" aria-modal="true">
-  <div class="modal-box">
-    <div class="modal-head"><h3>تعديل المنشور</h3><button class="close-modal" onclick="closeEditModal()">×</button></div>
-    <label>عنوان المنشور</label><input id="editTitle" placeholder="عنوان المنشور (اختياري)">
-    <label>محتوى المنشور</label><textarea id="editDescription" placeholder="اكتب محتوى المنشور"></textarea>
-    <label>السعر بالجنيه</label><input id="editPrice" type="number" min="0" placeholder="السعر (اختياري)">
-    <label>نوع المنشور</label><select id="editType"><option value="عام">منشور عام</option><option value="بيع">عرض منتج للبيع</option><option value="طلب">طلب شراء</option></select>
-    <div class="modal-actions"><button class="primary" id="saveEditBtn" onclick="saveEditPost()">حفظ التعديلات</button><button class="secondary" onclick="closeEditModal()">إلغاء</button></div>
-  </div>
-</div>
-<div class="modal-overlay" id="deleteModal" role="dialog" aria-modal="true">
-  <div class="modal-box">
-    <div class="modal-head"><h3>تأكيد حذف المنشور</h3><button class="close-modal" onclick="closeDeleteModal()">×</button></div>
-    <p>هل أنت متأكد أنك تريد حذف هذا المنشور؟</p>
-    <div class="modal-actions"><button class="danger" id="confirmDeleteBtn" onclick="confirmDeletePost()">نعم، احذف المنشور</button><button class="secondary" onclick="closeDeleteModal()">إلغاء</button></div>
-  </div>
-</div>
-
+<aside class="panel ornament profile" id="about"><img id="avatar" class="avatar" src="https://placehold.co/160x160/e6d4bb/704528?text=D" alt="الصورة الشخصية"><h2 id="name">عضو دمياطي</h2><div id="accountType" class="tag">عضو في مجتمع دمياطي</div><p id="governorate">دمياط - مصر</p><div class="btnrow" style="justify-content:center"><label class="btn light" for="avatarFile">تغيير الصورة</label><input id="avatarFile" type="file" accept="image/*" class="hidden" onchange="uploadAvatar()"></div><div class="details"><div>✧ <span id="showroom">مساحتك الخاصة</span></div><div>✧ عضو في مجتمع دمياطي</div></div><p style="margin-top:20px;font-size:13px">معًا نبني مجتمعًا أقوى في عالم الأثاث الدمياطي</p></aside>
+</div><footer class="foot">دمياطي · يجمع أهل صناعة الأثاث ومحبيه</footer>
 <script>
-const SUPABASE_URL = "https://lytlefegtvcjgfvfbwnu.supabase.co";
-const SUPABASE_KEY = "sb_publishable_sIBXEfGZV73j0kDb27oykw_KsPcD0dk";
-const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-let currentUser = null, cachedPosts = [], selectedFiles = [], editingPostId = null, deletingPostId = null;
-
-function esc(value){return String(value ?? "").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));}
-function displayName(){const m=currentUser?.user_metadata||{};return m.showroom_name||m.full_name||currentUser?.email||"عضو في دمياطي";}
-function setMessage(text,show=true){const el=document.getElementById("message");el.textContent=text;el.style.display=show?"block":"none";}
-
-function showTab(tab,button){
-  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
-  button.classList.add("active");
-  document.getElementById("aboutPanel").classList.toggle("hidden",tab!=="about");
-  document.getElementById("postsPanel").classList.toggle("hidden",tab==="about");
-  if(tab!=="about") renderPosts(tab);
-}
-function toggleComposer(force){const f=document.getElementById("composerForm");const open=typeof force==="boolean"?force:!f.classList.contains("open");f.classList.toggle("open",open);if(open)document.getElementById("description").focus();}
-document.getElementById("images").addEventListener("change",e=>{selectedFiles=Array.from(e.target.files||[]);showPreview();});
-function showPreview(){const box=document.getElementById("preview");box.innerHTML="";selectedFiles.forEach((file,i)=>{const url=URL.createObjectURL(file);const d=document.createElement("div");d.className="preview-item";d.innerHTML=`<img src="${url}" alt="معاينة الصورة"><button type="button" onclick="removePreview(${i})">×</button>`;box.append(d);});}
-function removePreview(i){selectedFiles.splice(i,1);const dt=new DataTransfer();selectedFiles.forEach(f=>dt.items.add(f));document.getElementById("images").files=dt.files;showPreview();}
-
-async function uploadAvatar(){
- const file=document.getElementById("avatarFile").files[0],btn=document.getElementById("uploadButton");
- if(!file){alert("اختار صورة أولاً من علامة الكاميرا");return;}
- if(!file.type.startsWith("image/")){alert("اختار ملف صورة فقط");return;}
- if(file.size>5*1024*1024){alert("حجم الصورة يجب ألا يتجاوز 5 ميجابايت");return;}
- btn.disabled=true;btn.textContent="جارٍ الرفع...";
- try{
-  const ext=(file.name.split(".").pop()||"jpg").toLowerCase().replace(/[^a-z0-9]/g,"")||"jpg";
-  const path=currentUser.id+"/"+Date.now()+"."+ext;
-  const {error:upErr}=await db.storage.from("profile-images").upload(path,file,{upsert:false,contentType:file.type});
-  if(upErr)throw upErr;
-  const {data}=db.storage.from("profile-images").getPublicUrl(path);
-  const {error:saveErr}=await db.auth.updateUser({data:{avatar_url:data.publicUrl}});
-  if(saveErr)throw saveErr;
-  currentUser.user_metadata.avatar_url=data.publicUrl;
-  document.getElementById("avatar").src=data.publicUrl;
-  document.getElementById("composerAvatar").src=data.publicUrl;
-  alert("تم تحديث الصورة الشخصية");
-  document.getElementById("avatarFile").value="";
- }catch(e){alert("تعذر تحديث الصورة: "+e.message);}
- finally{btn.disabled=false;btn.textContent="حفظ الصورة";}
-}
-
-async function loadProfile(){
- const {data,error}=await db.auth.getUser();
- if(error||!data.user){currentUser=null;setMessage("يرجى تسجيل الدخول أولاً.");document.getElementById("myPosts").textContent="سجل الدخول لعرض منشوراتك.";return;}
- currentUser=data.user;const info=currentUser.user_metadata||{};
- const name=info.showroom_name||info.full_name||"عضو دمياطي";
- document.getElementById("name").textContent=name;
- document.getElementById("aboutName").textContent=name;
- document.getElementById("type").textContent=info.account_type==="business"?"معرض / نشاط تجاري":"عميل";
- document.getElementById("accountLine").textContent=info.account_type==="business"?"حساب معرض أو نشاط تجاري":"عضو في مجتمع دمياطي";
- document.getElementById("governorate").textContent=info.governorate||"غير مسجلة";
- document.getElementById("bio").textContent=info.bio||"";
- if(info.avatar_url){document.getElementById("avatar").src=info.avatar_url;document.getElementById("composerAvatar").src=info.avatar_url;}
- if(info.showroom_name){document.getElementById("showroom").textContent=info.showroom_name;document.getElementById("showroomRow").hidden=false;}
- setMessage("",false);
- await loadMyPosts();
-}
-
-async function loadMyPosts(){
- const box=document.getElementById("myPosts");
- if(!currentUser){box.textContent="سجل الدخول لعرض منشوراتك.";return;}
- box.className="loading";box.textContent="جارٍ تحميل منشوراتك...";
- const {data,error}=await db.from("posts").select("*").eq("user_id",currentUser.id).order("created_at",{ascending:false}).limit(100);
- if(error){box.textContent="تعذر تحميل المنشورات: "+error.message;return;}
- cachedPosts=data||[];
- if(cachedPosts.length){
-  const ids=cachedPosts.map(p=>p.id);
-  const [{data:images,error:imageErr},{data:likes,error:likesErr}]=await Promise.all([
-   db.from("post_images").select("post_id,image_url").in("post_id",ids),
-   db.from("post_likes").select("post_id,user_id").in("post_id",ids)
-  ]);
-  cachedPosts.forEach(p=>{p.extraImages=!imageErr?(images||[]).filter(x=>String(x.post_id)===String(p.id)):[];});
-  const countMap={},mine={};
-  if(!likesErr)(likes||[]).forEach(x=>{countMap[x.post_id]=(countMap[x.post_id]||0)+1;if(x.user_id===currentUser.id)mine[x.post_id]=true;});
-  cachedPosts.forEach(p=>{p.likeCount=countMap[p.id]||0;p.likedByMe=!!mine[p.id];});
- }
- document.getElementById("postCount").textContent=cachedPosts.length;
- renderPosts("posts");
-}
-
-function renderPosts(mode="posts"){
- const box=document.getElementById("myPosts");box.innerHTML="";
- let posts=cachedPosts;
- if(mode==="photos")posts=posts.filter(p=>p.image_url||(p.extraImages||[]).length);
- document.getElementById("postsHeading").textContent=mode==="photos"?"صوري":"منشوراتي";
- if(!posts.length){box.className="empty";box.textContent=mode==="photos"?"لا توجد صور منشورة حتى الآن":"لم تنشر أي منشورات حتى الآن";return;}
- box.className="";
- posts.forEach(post=>{
-  let urls=[];if(post.image_url)urls.push(post.image_url);(post.extraImages||[]).forEach(x=>{if(x.image_url&&!urls.includes(x.image_url))urls.push(x.image_url);});
-  const pics=urls.map(url=>`<img src="${esc(url)}" alt="صورة المنشور" loading="lazy">`).join("");
-  const date=post.created_at?new Date(post.created_at).toLocaleDateString("ar-EG"):"";
-  const item=document.createElement("article");item.className="post";
-  item.innerHTML=`<div class="post-head">
-    <img class="avatar" src="${esc(currentUser.user_metadata?.avatar_url||"https://placehold.co/100x100?text=D")}" alt="">
-    <div><div class="post-name">${esc(displayName())}</div><div class="post-date">${esc(date)}</div></div>
-    <div class="post-menu-wrap"><button class="menu-trigger" onclick="togglePostMenu(${Number(post.id)})">⋮</button>
-      <div class="post-menu" id="menu-${Number(post.id)}"><button onclick="openEditModal(${Number(post.id)})">✏️ تعديل المنشور</button><button onclick="deletePost(${Number(post.id)})">🗑️ حذف المنشور</button></div>
-    </div></div>
-    ${post.title?`<h3 class="post-title">${esc(post.title)}</h3>`:""}
-    <div class="post-text">${esc(post.description||"")}</div>
-    ${post.price!==null&&post.price!==""?`<div class="post-price">السعر: ${esc(post.price)} جنيه</div>`:""}
-    ${post.post_type?`<div class="post-type">${esc(post.post_type)}</div>`:""}
-    ${pics?`<div class="post-images">${pics}</div>`:""}
-    <div class="post-actions"><button class="secondary" onclick="toggleLike(${Number(post.id)})"><span class="action-icon">👍</span>${post.likedByMe?"أعجبني":"إعجاب"} (${post.likeCount||0})</button></div>`;
-  box.append(item);
- });
-}
-
-async function createPost(){
- if(!currentUser){alert("سجل دخولك أولاً حتى تستطيع النشر.");location.href="login.html";return;}
- const description=document.getElementById("description").value.trim(),title=document.getElementById("title").value.trim(),priceText=document.getElementById("price").value.trim(),postType=document.getElementById("postType").value;
- if(!description){alert("اكتب محتوى المنشور أولاً.");return;}
- if(priceText&&(!Number.isFinite(Number(priceText))||Number(priceText)<0)){alert("اكتب سعرًا صحيحًا.");return;}
- const btn=document.getElementById("publishBtn");btn.disabled=true;btn.textContent="جارٍ النشر...";
- try{
-  const uploaded=[];
-  for(let i=0;i<selectedFiles.length;i++){
-   const file=selectedFiles[i];if(!file.type.startsWith("image/"))throw new Error("اختر ملفات صور فقط.");
-   const ext=(file.name.split(".").pop()||"jpg").replace(/[^a-zA-Z0-9]/g,"");
-   const path=currentUser.id+"/"+Date.now()+"_"+i+"."+ext;
-   const {error:upErr}=await db.storage.from("post-images").upload(path,file);if(upErr)throw upErr;
-   uploaded.push(db.storage.from("post-images").getPublicUrl(path).data.publicUrl);
-  }
-  const meta=currentUser.user_metadata||{};
-  const {data:newPost,error:postErr}=await db.from("posts").insert({user_id:currentUser.id,title:title||null,description,price:priceText?Number(priceText):null,post_type:postType,image_url:uploaded[0]||null,user_name:displayName(),user_avatar:meta.avatar_url||null}).select().single();
-  if(postErr)throw postErr;
-  if(uploaded.length){const {error:rowsErr}=await db.from("post_images").insert(uploaded.map(url=>({post_id:newPost.id,image_url:url})));if(rowsErr)alert("تم نشر المنشور لكن تعذر حفظ الصور الإضافية: "+rowsErr.message);}
-  document.getElementById("description").value="";document.getElementById("title").value="";document.getElementById("price").value="";document.getElementById("images").value="";selectedFiles=[];showPreview();toggleComposer(false);
-  alert("تم نشر المنشور.");await loadMyPosts();
- }catch(e){alert("لم يتم النشر: "+(e.message||"حدث خطأ"));}
- finally{btn.disabled=false;btn.textContent="نشر المنشور";}
-}
-
-async function toggleLike(id){
- if(!currentUser){alert("سجل دخولك أولاً للإعجاب.");location.href="login.html";return;}
- const {data:existing,error:findErr}=await db.from("post_likes").select("post_id").eq("post_id",id).eq("user_id",currentUser.id).maybeSingle();
- if(findErr){alert("تعذر التحقق من الإعجاب: "+findErr.message);return;}
- const result=existing?await db.from("post_likes").delete().eq("post_id",id).eq("user_id",currentUser.id):await db.from("post_likes").insert({post_id:id,user_id:currentUser.id});
- if(result.error)alert("تعذر تسجيل الإعجاب: "+result.error.message);else await loadMyPosts();
-}
-function togglePostMenu(id){const target=document.getElementById("menu-"+id);document.querySelectorAll(".post-menu.open").forEach(x=>{if(x!==target)x.classList.remove("open");});if(target)target.classList.toggle("open");}
-function openEditModal(id){
- const p=cachedPosts.find(x=>Number(x.id)===Number(id));if(!p)return;editingPostId=p.id;
- document.getElementById("editTitle").value=p.title||"";document.getElementById("editDescription").value=p.description||"";document.getElementById("editPrice").value=p.price??"";document.getElementById("editType").value=p.post_type||"عام";document.getElementById("editModal").classList.add("show");
-}
-function closeEditModal(){document.getElementById("editModal").classList.remove("show");editingPostId=null;}
-async function saveEditPost(){
- if(editingPostId===null)return;
- const title=document.getElementById("editTitle").value.trim(),description=document.getElementById("editDescription").value.trim(),price=document.getElementById("editPrice").value.trim(),type=document.getElementById("editType").value;
- if(!description){alert("اكتب محتوى المنشور أولاً.");return;}
- if(price&&(!Number.isFinite(Number(price))||Number(price)<0)){alert("اكتب سعرًا صحيحًا.");return;}
- const btn=document.getElementById("saveEditBtn");btn.disabled=true;btn.textContent="جارٍ الحفظ...";
- const {error}=await db.from("posts").update({title:title||null,description,price:price?Number(price):null,post_type:type}).eq("id",editingPostId).eq("user_id",currentUser.id);
- btn.disabled=false;btn.textContent="حفظ التعديلات";
- if(error){alert("تعذر تعديل المنشور: "+error.message);return;}closeEditModal();await loadMyPosts();
-}
-function deletePost(id){const p=cachedPosts.find(x=>Number(x.id)===Number(id));if(!p||p.user_id!==currentUser.id){alert("لا يمكنك حذف هذا المنشور.");return;}deletingPostId=p.id;document.getElementById("deleteModal").classList.add("show");}
-function closeDeleteModal(){document.getElementById("deleteModal").classList.remove("show");deletingPostId=null;}
-async function confirmDeletePost(){
- if(deletingPostId===null)return;const btn=document.getElementById("confirmDeleteBtn");btn.disabled=true;btn.textContent="جارٍ الحذف...";
- const {error}=await db.from("posts").delete().eq("id",deletingPostId).eq("user_id",currentUser.id);
- btn.disabled=false;btn.textContent="نعم، احذف المنشور";
- if(error){alert("تعذر حذف المنشور: "+error.message);return;}closeDeleteModal();await loadMyPosts();
-}
-async function logout(){const {error}=await db.auth.signOut();if(error){alert("تعذر تسجيل الخروج: "+error.message);return;}location.href="login.html";}
-document.getElementById("editModal").addEventListener("click",e=>{if(e.target.id==="editModal")closeEditModal();});
-document.getElementById("deleteModal").addEventListener("click",e=>{if(e.target.id==="deleteModal")closeDeleteModal();});
-loadProfile();
-</script>
-</body>
-</html>
+const SUPABASE_URL='https://lytlefegtvcjgfvfbwnu.supabase.co';
+const SUPABASE_KEY='sb_publishable_sIBXEfGZV73j0kDb27oykw_KsPcD0dk';
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);let currentUser=null;let myPosts=[];
+const el=id=>document.getElementById(id);const say=t=>el('status').textContent=t;
+async function init(){const {data:{user},error}=await db.auth.getUser();if(error||!user){el('posts').innerHTML='<div class="empty">من فضلك سجل الدخول أولاً. <a href="login.html">تسجيل الدخول</a></div>';return}currentUser=user;const m=user.user_metadata||{};el('name').textContent=m.full_name||m.showroom_name||'عضو دمياطي';el('accountType').textContent=m.account_type==='showroom'?'معرض / مصنع':'عضو في مجتمع دمياطي';el('governorate').textContent=m.governorate||'دمياط - مصر';el('showroom').textContent=m.showroom_name||'مساحتك الخاصة';if(m.avatar_url)el('avatar').src=m.avatar_url;await loadPosts()}
+async function loadPosts(){const {data,error}=await db.from('posts').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});if(error){el('posts').innerHTML='<div class="empty">تعذر تحميل المنشورات: '+error.message+'</div>';return}myPosts=data||[];let ids=myPosts.map(p=>p.id);let extras=[];let likes=[];if(ids.length){const a=await db.from('post_images').select('*').in('post_id',ids);extras=a.data||[];const b=await db.from('post_likes').select('post_id,user_id').in('post_id',ids);likes=b.data||[]}let photos=0,likeTotal=0;let gallery=[];for(const p of myPosts){let imgs=[p.image_url,...extras.filter(x=>String(x.post_id)===String(p.id)).map(x=>x.image_url)].filter(Boolean);imgs=[...new Set(imgs)];photos+=imgs.length;gallery.push(...imgs);let count=likes.filter(x=>String(x.post_id)===String(p.id)).length;likeTotal+=count;p._imgs=imgs;p._likes=count;p._liked=likes.some(x=>String(x.post_id)===String(p.id)&&x.user_id===currentUser.id)}el('postCount').textContent=myPosts.length;el('photoCount').textContent=photos;el('likeCount').textContent=likeTotal;el('gallery').innerHTML=gallery.length?gallery.slice(0,9).map(u=>`<img src="${esc(u)}" alt="صورة من أعمالي">`).join(''):'<div class="empty">ستظهر صور منشوراتك هنا</div>';el('posts').innerHTML=myPosts.length?myPosts.map(renderPost).join(''):'<div class="panel empty">لم تنشر شيئًا بعد. ابدأ بأول منشور لك.</div>'}
+function renderPost(p){return `<article class="panel ornament post"><div class="posthead"><img class="mini" src="${esc(el('avatar').src)}"><div><strong>${esc(el('name').textContent)}</strong><small>${new Date(p.created_at).toLocaleString('ar-EG')}</small></div></div>${p.title?`<h3>${esc(p.title)}</h3>`:''}<p>${esc(p.description||'')}</p>${p.price?`<b>السعر: ${esc(p.price)}</b>`:''}${p._imgs.length?`<div class="postimgs">${p._imgs.map(u=>`<img src="${esc(u)}" alt="صورة المنشور">`).join('')}</div>`:''}<div class="actions"><button class="btn light" onclick="toggleLike(${p.id},${p._liked})">${p._liked?'♥':'♡'} إعجاب · ${p._likes}</button><button class="btn light" onclick="editPost(${p.id})">تعديل</button><button class="btn light" onclick="deletePost(${p.id})">حذف</button></div></article>`}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function clearComposer(){el('postTitle').value='';el('postText').value='';el('postPrice').value='';el('postImages').value='';say('')}
+async function createPost(){let description=el('postText').value.trim();if(!description){say('اكتب وصف المنشور أولاً');return}say('جارٍ نشر المنشور...');let files=[...el('postImages').files];let urls=[];for(const f of files){let path=`${currentUser.id}/${Date.now()}-${Math.random().toString(36).slice(2)}-${f.name.replace(/[^\w.\-]/g,'_')}`;let up=await db.storage.from('post-images').upload(path,f,{upsert:false});if(up.error){say('مشكلة في رفع الصورة: '+up.error.message);return}urls.push(db.storage.from('post-images').getPublicUrl(path).data.publicUrl)}let payload={user_id:currentUser.id,title:el('postTitle').value.trim(),description,price:el('postPrice').value.trim(),image_url:urls[0]||null,user_name:el('name').textContent,user_avatar:el('avatar').src};let ins=await db.from('posts').insert(payload).select().single();if(ins.error){say('تعذر نشر المنشور: '+ins.error.message);return}if(urls.length){let rows=urls.map(image_url=>({post_id:ins.data.id,image_url}));let more=await db.from('post_images').insert(rows);if(more.error){say('تم نشر النص لكن تعذر حفظ بعض الصور: '+more.error.message);return}}clearComposer();say('تم نشر منشورك بنجاح');await loadPosts()}
+async function toggleLike(id,liked){if(liked){const r=await db.from('post_likes').delete().eq('post_id',id).eq('user_id',currentUser.id);if(r.error)alert(r.error.message)}else{const r=await db.from('post_likes').insert({post_id:id,user_id:currentUser.id});if(r.error&&r.error.code!=='23505')alert(r.error.message)}await loadPosts()}
+async function deletePost(id){if(!confirm('هل تريد حذف المنشور؟'))return;const r=await db.from('posts').delete().eq('id',id).eq('user_id',currentUser.id);if(r.error){alert(r.error.message);return}await loadPosts()}
+async function editPost(id){const p=myPosts.find(x=>String(x.id)===String(id));if(!p)return;let title=prompt('تعديل عنوان المنشور',p.title||'');if(title===null)return;let description=prompt('تعديل نص المنشور',p.description||'');if(description===null)return;let price=prompt('تعديل السعر',p.price||'');if(price===null)return;const r=await db.from('posts').update({title,description,price}).eq('id',id).eq('user_id',currentUser.id);if(r.error){alert(r.error.message);return}await loadPosts()}
+async function uploadAvatar(){const f=el('avatarFile').files[0];if(!f)return;const path=`${currentUser.id}/avatar-${Date.now()}-${f.name.replace(/[^\w.\-]/g,'_')}`;const up=await db.storage.from('profile-images').upload(path,f,{upsert:true});if(up.error){alert(up.error.message);return}const url=db.storage.from('profile-images').getPublicUrl(path).data.publicUrl;const res=await db.auth.updateUser({data:{avatar_url:url}});if(res.error){alert(res.error.message);return}el('avatar').src=url;alert('تم تحديث الصورة الشخصية')}
+async function logout(){await db.auth.signOut();location.href='login.html'}
+init();
+</script></body></html>

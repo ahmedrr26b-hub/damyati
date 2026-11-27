@@ -51,6 +51,23 @@ button{cursor:pointer}
 .danger{background:#b83232;color:#fff;border:0;border-radius:10px;padding:12px}
 .modal-note{color:#687787;font-size:13px;line-height:1.6}
 
+
+.composer-trigger{display:flex;align-items:center;gap:10px;width:100%;border:0;background:transparent;padding:2px 0 10px;text-align:right}
+.composer-trigger .fake-input{flex:1;background:#f0f2f5;color:#687787;border-radius:24px;padding:13px 16px;font-size:15px}
+.composer-form{display:none;border-top:1px solid #edf0f3;padding-top:14px}
+.composer-form.open{display:block}
+.post-head{position:relative}
+.post-menu-wrap{margin-inline-start:auto;position:relative}
+.menu-trigger{border:0;background:transparent;color:#657786;font-size:25px;line-height:1;padding:6px 10px;border-radius:50%}
+.menu-trigger:hover{background:#f0f2f5}
+.post-menu{display:none;position:absolute;top:38px;left:0;z-index:5;background:#fff;min-width:145px;padding:6px;border-radius:12px;box-shadow:0 4px 18px #0002}
+.post-menu.open{display:block}
+.post-menu button{display:block;width:100%;border:0;background:#fff;text-align:right;padding:11px;border-radius:8px;color:#263445}
+.post-menu button:hover{background:#f0f4f8}
+.post-actions{display:flex;gap:8px;flex-wrap:nowrap}
+.post-actions button{flex:1;min-width:0}
+.action-icon{font-size:17px;margin-left:5px}
+
 </style>
 </head>
 <body>
@@ -77,19 +94,28 @@ button{cursor:pointer}
   </section>
 
   <section class="card">
-    <h3 class="section-title">بماذا تفكر؟</h3>
-    <textarea id="description" placeholder="اكتب منشورك هنا..."></textarea>
-    <input id="title" placeholder="عنوان المنشور (اختياري)">
-    <input id="price" type="number" min="0" placeholder="السعر بالجنيه (اختياري)">
-    <select id="postType">
-      <option value="عام">منشور عام</option>
-      <option value="بيع">عرض منتج للبيع</option>
-      <option value="طلب">طلب شراء</option>
-    </select>
-    <label for="images">إضافة صور (يمكن اختيار أكثر من صورة)</label>
-    <input id="images" type="file" accept="image/*" multiple>
-    <div id="preview"></div>
-    <button class="primary" id="publishBtn" onclick="createPost()">نشر المنشور</button>
+    <h3 class="section-title">إنشاء منشور</h3>
+    <button type="button" class="composer-trigger" onclick="toggleComposer()">
+      <img class="avatar" src="https://placehold.co/100x100?text=D" alt="">
+      <span class="fake-input">بماذا تفكر؟ اضغط لكتابة منشور...</span>
+    </button>
+    <div class="composer-form" id="composerForm">
+      <textarea id="description" placeholder="اكتب منشورك هنا..."></textarea>
+      <input id="title" placeholder="عنوان المنشور (اختياري)">
+      <input id="price" type="number" min="0" placeholder="السعر بالجنيه (اختياري)">
+      <select id="postType">
+        <option value="عام">منشور عام</option>
+        <option value="بيع">عرض منتج للبيع</option>
+        <option value="طلب">طلب شراء</option>
+      </select>
+      <label for="images">إضافة صور (يمكن اختيار أكثر من صورة)</label>
+      <input id="images" type="file" accept="image/*" multiple>
+      <div id="preview"></div>
+      <div class="modal-actions">
+        <button class="primary" id="publishBtn" onclick="createPost()">نشر المنشور</button>
+        <button class="secondary" type="button" onclick="toggleComposer(false)">إلغاء</button>
+      </div>
+    </div>
   </section>
 
   <h3 class="section-title">أحدث المنشورات</h3>
@@ -191,6 +217,13 @@ function removePreview(index) {
   showPreview();
 }
 
+function toggleComposer(forceOpen) {
+  const form = document.getElementById("composerForm");
+  const open = typeof forceOpen === "boolean" ? forceOpen : !form.classList.contains("open");
+  form.classList.toggle("open", open);
+  if (open) document.getElementById("description").focus();
+}
+
 async function startPage() {
   const { data, error } = await db.auth.getUser();
   if (error) console.warn(error.message);
@@ -256,6 +289,13 @@ async function loadPosts() {
         <img class="avatar" src="${escapeHTML(post.user_avatar || "https://placehold.co/100x100?text=D")}" alt="">
         <div><div class="post-name">${escapeHTML(post.user_name || "عضو في دمياطي")}</div>
         <div class="post-date">${escapeHTML(date)}</div></div>
+        ${owner ? `<div class="post-menu-wrap">
+          <button class="menu-trigger" type="button" aria-label="خيارات المنشور" onclick="togglePostMenu(${Number(post.id)})">⋮</button>
+          <div class="post-menu" id="menu-${Number(post.id)}">
+            <button type="button" onclick="openEditModal(${Number(post.id)})">✏️ تعديل المنشور</button>
+            <button type="button" onclick="deletePost(${Number(post.id)})">🗑️ حذف المنشور</button>
+          </div>
+        </div>` : ""}
       </div>
       ${post.title ? `<h3>${escapeHTML(post.title)}</h3>` : ""}
       <div class="post-text">${escapeHTML(post.description)}</div>
@@ -263,10 +303,8 @@ async function loadPosts() {
       ${post.post_type ? `<div class="post-date">${escapeHTML(post.post_type)}</div>` : ""}
       ${pics ? `<div class="post-images">${pics}</div>` : ""}
       <div class="post-actions">
-        <button class="secondary" onclick="toggleLike(${Number(post.id)})">👍 ${likedByMe[post.id] ? "أعجبني" : "إعجاب"} (${likesMap[post.id] || 0})</button>
-        <button class="secondary" onclick="sendMessage('${escapeHTML(post.user_id || "")}')">💬 رسالة</button>
-        ${owner ? `<button class="secondary" onclick="openEditModal(${Number(post.id)})">✏️ تعديل</button>
-        <button class="secondary" onclick="deletePost(${Number(post.id)})">🗑️ حذف</button>` : ""}
+        <button class="secondary" onclick="toggleLike(${Number(post.id)})"><span class="action-icon">👍</span>${likedByMe[post.id] ? "أعجبني" : "إعجاب"} (${likesMap[post.id] || 0})</button>
+        <button class="secondary" onclick="sendMessage('${escapeHTML(post.user_id || "")}')"><span class="action-icon">💬</span>رسالة</button>
       </div>`;
     area.appendChild(article);
   });
@@ -382,6 +420,14 @@ function sendMessage(userId) {
     return;
   }
   location.href = "messages.html?to=" + encodeURIComponent(userId);
+}
+
+function togglePostMenu(id) {
+  const target = document.getElementById("menu-" + id);
+  document.querySelectorAll(".post-menu.open").forEach(menu => {
+    if (menu !== target) menu.classList.remove("open");
+  });
+  if (target) target.classList.toggle("open");
 }
 
 let editingPostId = null;

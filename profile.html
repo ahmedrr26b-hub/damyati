@@ -3,238 +3,301 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>صفحتي الشخصية - دمياطي</title>
+<title>الملف الشخصي - دمياطي</title>
 <style>
-body {
-  font-family: Arial;
-  background: #eef4fb;
-  margin: 0;
-  padding: 20px;
-}
-.box {
-  background: white;
-  max-width: 450px;
-  margin: 30px auto;
-  padding: 25px;
-  border-radius: 15px;
-  text-align: center;
-}
-h2 { color: #1261a0; }
-.info {
-  background: #f2f6fa;
-  padding: 12px;
-  margin: 10px 0;
-  border-radius: 8px;
-  text-align: right;
-}
-button {
-  background: #1261a0;
-  color: white;
-  border: 0;
-  padding: 13px;
-  width: 100%;
-  border-radius: 8px;
-  margin-top: 12px;
-  font-size: 16px;
+:root{--blue:#1769aa;--blue2:#0f4f86;--bg:#edf2f7;--text:#172b3a;--muted:#6b7c8c;--line:#e4ebf2}
+*{box-sizing:border-box}
+body{font-family:Arial,sans-serif;background:var(--bg);margin:0;color:var(--text)}
+.topbar{height:58px;background:#fff;box-shadow:0 2px 10px #17324d12;display:flex;align-items:center;justify-content:space-between;padding:0 max(16px,calc((100% - 1000px)/2));position:sticky;top:0;z-index:5}
+.brand{font-size:23px;font-weight:800;color:var(--blue);letter-spacing:.3px}
+.top-actions{display:flex;gap:8px}
+.small-btn{border:0;background:#edf4fb;color:var(--blue);padding:9px 13px;border-radius:10px;font-weight:bold;cursor:pointer}
+.page{max-width:960px;margin:20px auto;padding:0 12px}
+.profile-card,.panel{background:#fff;border-radius:16px;box-shadow:0 3px 14px #1d3c5810;overflow:hidden;margin-bottom:16px}
+.cover{height:210px;background:linear-gradient(120deg,#0d4776,#2387c8 55%,#a9d8f2);position:relative}
+.cover:after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,#062d4b55,transparent 60%)}
+.profile-main{padding:0 24px 20px;position:relative}
+.avatar-wrap{width:142px;height:142px;border-radius:50%;border:5px solid white;background:#e6f0f8;position:relative;margin-top:-72px;z-index:1}
+#avatar{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}
+.camera{position:absolute;bottom:5px;left:5px;background:#fff;border:1px solid var(--line);border-radius:50%;width:34px;height:34px;display:grid;place-items:center;cursor:pointer}
+#avatarFile{display:none}
+.identity{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-top:8px}
+.name{font-size:25px;font-weight:800;margin:0 0 7px}
+.sub{color:var(--muted);font-size:14px;line-height:1.7}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.primary,.secondary{border:0;border-radius:10px;padding:11px 16px;font-size:14px;font-weight:bold;cursor:pointer}
+.primary{background:var(--blue);color:white}
+.secondary{background:#edf4fb;color:var(--blue)}
+.bio{margin:14px 0 5px;line-height:1.8;color:#34495a}
+.stats{display:flex;gap:22px;border-top:1px solid var(--line);padding-top:15px;margin-top:16px;color:var(--muted);font-size:14px}
+.stats b{color:var(--text);font-size:16px}
+.tabs{display:flex;gap:5px;padding:0 18px;border-top:1px solid var(--line);overflow:auto}
+.tab{border:0;background:transparent;padding:15px 17px;color:var(--muted);font-weight:bold;cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent}
+.tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+.content-grid{display:grid;grid-template-columns: minmax(0,1fr) 1.5fr;gap:16px;align-items:start}
+.panel{padding:18px}
+.panel h3{margin:0 0 14px;font-size:18px}
+.info-row{padding:11px 0;border-bottom:1px solid var(--line);font-size:14px;line-height:1.7}
+.info-row:last-child{border:0}
+.info-label{color:var(--muted);display:block;font-size:12px;margin-bottom:3px}
+.posts-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.posts-head h3{margin:0}
+.post{border:1px solid var(--line);border-radius:13px;padding:15px;margin-bottom:13px}
+.post:last-child{margin-bottom:0}
+.post-title{font-size:17px;margin:0 0 8px}
+.post-desc{line-height:1.8;margin:0 0 10px;white-space:pre-wrap}
+.post-date{font-size:12px;color:var(--muted);margin-bottom:10px}
+.post-images{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.post-images img{width:100%;max-height:290px;object-fit:cover;border-radius:9px;background:#f1f4f7}
+.price{font-weight:bold;color:#087b55;margin-top:10px}
+.empty,.loading{color:var(--muted);text-align:center;padding:24px 10px;line-height:1.8}
+.message{padding:12px 15px;background:#fff4e5;color:#84520b;border-radius:10px;margin-bottom:14px;display:none}
+.hidden{display:none!important}
+@media(max-width:700px){
+ .page{margin:12px auto;padding:0 9px}.cover{height:155px}.profile-main{padding:0 15px 17px}
+ .avatar-wrap{width:116px;height:116px;margin-top:-58px}.identity{display:block}.actions{margin-top:13px}
+ .content-grid{grid-template-columns:1fr;gap:10px}.profile-card,.panel{border-radius:13px}
+ .name{font-size:22px}.stats{gap:16px;flex-wrap:wrap}
+ .post-images{grid-template-columns:1fr 1fr}
 }
 </style>
 </head>
 <body>
+<header class="topbar">
+  <div class="brand">دمياطي</div>
+  <div class="top-actions">
+    <button class="small-btn" onclick="location.href='index.html'">الرئيسية</button>
+    <button class="small-btn" onclick="location.href='messages.html'">الرسائل</button>
+  </div>
+</header>
 
-<div class="box">
-  <h2>صفحتي الشخصية</h2><div style="margin:15px">
-  <img id="avatar"
-  src="https://placehold.co/120x120?text=Photo"
-  style="width:120px;height:120px;border-radius:50%;object-fit:cover">
-  <br>
-  <input type="file" id="avatarFile" accept="image/*">
-  <button onclick="uploadAvatar()">رفع الصورة</button>
-</div>
-  <p id="message">جارٍ تحميل بيانات حسابك...</p>
+<main class="page">
+  <div id="message" class="message">جارٍ تحميل بيانات الحساب...</div>
 
-  <div id="profile" hidden>
-    <div class="info">الاسم: <span id="name"></span></div>
-    <div class="info">البريد الإلكتروني: <span id="email"></span></div>
-    <div class="info">رقم الهاتف: <span id="phone"></span></div>
-    <div class="info">نوع الحساب: <span id="type"></span></div>
-    <div class="info" id="showroomRow" hidden>
-      اسم المعرض: <span id="showroom"></span>
+  <section class="profile-card">
+    <div class="cover"></div>
+    <div class="profile-main">
+      <div class="avatar-wrap">
+        <img id="avatar" src="https://placehold.co/300x300/e8f1f8/1769aa?text=Dam yati" alt="الصورة الشخصية">
+        <label class="camera" for="avatarFile" title="تغيير الصورة">📷</label>
+        <input type="file" id="avatarFile" accept="image/*">
+      </div>
+      <div class="identity">
+        <div>
+          <h1 class="name" id="name">جارٍ التحميل...</h1>
+          <div class="sub" id="accountLine">عضو في دمياطي</div>
+        </div>
+        <div class="actions">
+          <button class="primary" id="uploadButton" onclick="uploadAvatar()">حفظ الصورة</button>
+          <button class="secondary" onclick="location.href='index.html'">العودة للرئيسية</button>
+        </div>
+      </div>
+      <p class="bio" id="bio"></p>
+      <div class="stats">
+        <span><b id="postCount">0</b> منشور</span>
+        <span>حساب على <b>دمياطي</b></span>
+      </div>
     </div>
+    <nav class="tabs">
+      <button class="tab active" data-tab="posts" onclick="showTab('posts',this)">المنشورات</button>
+      <button class="tab" data-tab="photos" onclick="showTab('photos',this)">الصور</button>
+      <button class="tab" data-tab="about" onclick="showTab('about',this)">حول الحساب</button>
+    </nav>
+  </section>
 
-    <button onclick="logout()">تسجيل الخروج</button>
-    <button onclick="location.href='market.html'">العودة إلى السوق</button>
-<hr style="margin:25px 0">
+  <div class="content-grid">
+    <aside id="aboutPanel" class="panel">
+      <h3>معلومات الحساب</h3>
+      <div class="info-row"><span class="info-label">الاسم</span><span id="aboutName">—</span></div>
+      <div class="info-row"><span class="info-label">نوع الحساب</span><span id="type">—</span></div>
+      <div class="info-row" id="showroomRow" hidden><span class="info-label">اسم المعرض</span><span id="showroom"></span></div>
+      <div class="info-row"><span class="info-label">المحافظة</span><span id="governorate">غير مسجلة</span></div>
+      <div class="info-row"><span class="info-label">رقم الهاتف</span><span id="phone">غير مسجل</span></div>
+      <div class="info-row"><span class="info-label">البريد الإلكتروني</span><span id="email">—</span></div>
+      <button class="secondary" style="width:100%;margin-top:14px" onclick="logout()">تسجيل الخروج</button>
+    </aside>
 
-<h2>📦 منشوراتي</h2>
-
-<div id="myPosts">
-  جارٍ تحميل منشوراتك...
-</div>
+    <section class="panel" id="postsPanel">
+      <div class="posts-head">
+        <h3 id="postsHeading">منشوراتي</h3>
+      </div>
+      <div id="myPosts" class="loading">جارٍ تحميل منشوراتك...</div>
+    </section>
+  </div>
+</main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const SUPABASE_URL = "https://lytlefegtvcjgfvfbwnu.supabase.co";
 const SUPABASE_KEY = "sb_publishable_sIBXEfGZV73j0kDb27oykw_KsPcD0dk";
-
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-async function uploadAvatar() {
-  const { data: userData } = await db.auth.getUser();
-  const user = userData.user;
+let cachedPosts = [];
 
-  if (!user) {
-    alert("سجل الدخول أولاً");
-    return;
-  }
-
-  const file = document.getElementById("avatarFile").files[0];
-
-  if (!file) {
-    alert("اختار صورة أولاً");
-    return;
-  }
-
-  if (!file.type.startsWith("image/")) {
-    alert("اختار ملف صورة فقط");
-    return;
-  }
-
-  const path = user.id + "/" + Date.now() + ".jpg";
-
-  const { error } = await db.storage
-    .from("profile-images")
-    .upload(path, file);
-
-  if (error) {
-    alert("تعذر رفع الصورة: " + error.message);
-    return;
-  }
-
-  const { data } = db.storage
-    .from("profile-images")
-    .getPublicUrl(path);
-
-  const imageUrl = data.publicUrl;
-
-  const { error: updateError } = await db.auth.updateUser({
-    data: { avatar_url: imageUrl }
-  });
-
-  if (updateError) {
-    alert("تم رفع الصورة لكن تعذر حفظ بياناتها");
-    return;
-  }
-
-  document.getElementById("avatar").src = imageUrl;
-  alert("تم رفع صورة الحساب بنجاح");
+function setMessage(text, show=true) {
+  const el = document.getElementById("message");
+  el.textContent = text;
+  el.style.display = show ? "block" : "none";
 }
+
+function showTab(tab, button) {
+  document.querySelectorAll(".tab").forEach(x => x.classList.remove("active"));
+  button.classList.add("active");
+  const about = document.getElementById("aboutPanel");
+  const posts = document.getElementById("postsPanel");
+  if (tab === "about") {
+    about.classList.remove("hidden");
+    posts.classList.add("hidden");
+  } else {
+    about.classList.add("hidden");
+    posts.classList.remove("hidden");
+    renderPosts(tab);
+  }
+}
+
+async function uploadAvatar() {
+  const button = document.getElementById("uploadButton");
+  const file = document.getElementById("avatarFile").files[0];
+  if (!file) { alert("اختار صورة أولاً من علامة الكاميرا"); return; }
+  if (!file.type.startsWith("image/")) { alert("اختار ملف صورة فقط"); return; }
+  if (file.size > 5 * 1024 * 1024) { alert("حجم الصورة يجب ألا يتجاوز 5 ميجابايت"); return; }
+
+  button.disabled = true;
+  button.textContent = "جارٍ الرفع...";
+  try {
+    const { data: userData, error: userError } = await db.auth.getUser();
+    if (userError || !userData.user) { alert("سجل الدخول أولاً"); return; }
+    const user = userData.user;
+    const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g,"") || "jpg";
+    const path = user.id + "/" + Date.now() + "." + ext;
+    const { error: uploadError } = await db.storage.from("profile-images").upload(path, file, { upsert: false, contentType: file.type });
+    if (uploadError) { alert("تعذر رفع الصورة: " + uploadError.message); return; }
+    const { data } = db.storage.from("profile-images").getPublicUrl(path);
+    const imageUrl = data.publicUrl;
+    const { error: updateError } = await db.auth.updateUser({ data: { avatar_url: imageUrl } });
+    if (updateError) { alert("تم رفع الصورة لكن تعذر حفظ بياناتها: " + updateError.message); return; }
+    document.getElementById("avatar").src = imageUrl;
+    alert("تم تحديث الصورة الشخصية بنجاح");
+    document.getElementById("avatarFile").value = "";
+  } catch (e) {
+    alert("حدث خطأ أثناء رفع الصورة: " + e.message);
+  } finally {
+    button.disabled = false;
+    button.textContent = "حفظ الصورة";
+  }
+}
+
 async function loadProfile() {
   const { data, error } = await db.auth.getUser();
-
   if (error || !data.user) {
-    document.getElementById("message").textContent =
-      "يرجى تسجيل الدخول أولاً";
+    setMessage("يرجى تسجيل الدخول أولاً.");
+    document.getElementById("myPosts").textContent = "سجل الدخول لعرض منشوراتك.";
     return;
   }
-
   const user = data.user;
   const info = user.user_metadata || {};
-if (info.avatar_url) {
-  document.getElementById("avatar").src = info.avatar_url;
-}
-  document.getElementById("name").textContent =
-    info.full_name || "غير مسجل";
-
-  document.getElementById("email").textContent = user.email || "";
-  document.getElementById("phone").textContent =
-    info.phone || "غير مسجل";
-
-  document.getElementById("type").textContent =
-    info.account_type === "business" ? "معرض" : "عميل";
-
+  const fullName = info.full_name || info.showroom_name || "عضو دمياطي";
+  document.getElementById("name").textContent = fullName;
+  document.getElementById("aboutName").textContent = fullName;
+  document.getElementById("email").textContent = user.email || "—";
+  document.getElementById("phone").textContent = info.phone || "غير مسجل";
+  document.getElementById("type").textContent = info.account_type === "business" ? "معرض / نشاط تجاري" : "عميل";
+  document.getElementById("accountLine").textContent = info.account_type === "business" ? "حساب معرض أو نشاط تجاري" : "عضو في مجتمع دمياطي";
+  document.getElementById("governorate").textContent = info.governorate || "غير مسجلة";
+  document.getElementById("bio").textContent = info.bio || "";
+  if (info.avatar_url) document.getElementById("avatar").src = info.avatar_url;
   if (info.showroom_name) {
-    document.getElementById("showroom").textContent =
-      info.showroom_name;
+    document.getElementById("showroom").textContent = info.showroom_name;
     document.getElementById("showroomRow").hidden = false;
   }
-
-  document.getElementById("message").textContent = "";
-  document.getElementById("profile").hidden = false;
+  setMessage("", false);
 }
 
-async function logout() {
-  const { error } = await db.auth.signOut();
+function makeImage(url) {
+  const img = document.createElement("img");
+  img.src = url;
+  img.alt = "صورة من المنشور";
+  img.loading = "lazy";
+  return img;
+}
 
-  if (error) {
-    alert("تعذر تسجيل الخروج");
+function renderPosts(mode="posts") {
+  const box = document.getElementById("myPosts");
+  box.innerHTML = "";
+  let posts = cachedPosts;
+  if (mode === "photos") posts = posts.filter(p => p.image_url || (p.extraImages && p.extraImages.length));
+  document.getElementById("postsHeading").textContent = mode === "photos" ? "صوري" : "منشوراتي";
+  if (!posts.length) {
+    box.className = "empty";
+    box.textContent = mode === "photos" ? "لا توجد صور منشورة حتى الآن" : "لم تنشر أي منشورات حتى الآن";
     return;
   }
-
-  location.href = "login.html";
+  box.className = "";
+  posts.forEach(post => {
+    const item = document.createElement("article");
+    item.className = "post";
+    if (post.title) {
+      const title = document.createElement("h4");
+      title.className = "post-title";
+      title.textContent = post.title;
+      item.append(title);
+    }
+    if (post.description) {
+      const desc = document.createElement("p");
+      desc.className = "post-desc";
+      desc.textContent = post.description;
+      item.append(desc);
+    }
+    const date = document.createElement("div");
+    date.className = "post-date";
+    date.textContent = post.created_at ? new Date(post.created_at).toLocaleString("ar-EG") : "";
+    item.append(date);
+    const urls = [];
+    if (post.image_url) urls.push(post.image_url);
+    (post.extraImages || []).forEach(x => { if (x.image_url && !urls.includes(x.image_url)) urls.push(x.image_url); });
+    if (urls.length) {
+      const images = document.createElement("div");
+      images.className = "post-images";
+      urls.forEach(url => images.append(makeImage(url)));
+      item.append(images);
+    }
+    if (post.price) {
+      const price = document.createElement("div");
+      price.className = "price";
+      price.textContent = "السعر: " + post.price + " جنيه";
+      item.append(price);
+    }
+    box.append(item);
+  });
 }
 
 async function loadMyPosts() {
   const box = document.getElementById("myPosts");
+  const { data: userData, error: userError } = await db.auth.getUser();
+  const user = userData && userData.user;
+  if (userError || !user) { box.textContent = "سجل الدخول لعرض منشوراتك."; return; }
 
-  const { data: userData } = await db.auth.getUser();
-  const user = userData.user;
-
-  if (!user) {
-    box.textContent = "سجل الدخول لعرض منشوراتك";
-    return;
-  }
-
-  const { data, error } = await db
-    .from("posts")
-    .select("*")
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    box.textContent = "تعذر تحميل المنشورات: " + error.message;
-    return;
-  }
-
-  box.innerHTML = "";
-
-  if (!data || data.length === 0) {
-    box.textContent = "لم تنشر أي منشورات حتى الآن";
-    return;
-  }
-
-  data.forEach(post => {
-    const item = document.createElement("div");
-    item.style.cssText =
-      "background:#f2f6fa;padding:15px;margin:12px 0;border-radius:10px;text-align:right";
-
-    const title = document.createElement("h3");
-    title.textContent = post.title;
-    item.append(title);
-
-    const description = document.createElement("p");
-    description.textContent = post.description || "";
-    item.append(description);
-
-    if (post.image_url) {
-      const img = document.createElement("img");
-      img.src = post.image_url;
-      img.style.cssText =
-        "width:100%;max-height:300px;object-fit:contain;border-radius:8px";
-      item.append(img);
+  const { data, error } = await db.from("posts").select("*").eq("user_id", user.id).order("created_at", { ascending: false });
+  if (error) { box.textContent = "تعذر تحميل المنشورات: " + error.message; return; }
+  cachedPosts = data || [];
+  if (cachedPosts.length) {
+    const ids = cachedPosts.map(p => p.id);
+    const { data: images, error: imagesError } = await db.from("post_images").select("post_id,image_url").in("post_id", ids);
+    if (!imagesError && images) {
+      cachedPosts.forEach(post => post.extraImages = images.filter(img => String(img.post_id) === String(post.id)));
     }
+  }
+  document.getElementById("postCount").textContent = cachedPosts.length;
+  renderPosts("posts");
+}
 
-    if (post.price) {
-      const price = document.createElement("p");
-      price.textContent = "السعر: " + post.price + " جنيه";
-      item.append(price);
-    }
-
-    box.append(item);
-  });
+async function logout() {
+  const { error } = await db.auth.signOut();
+  if (error) { alert("تعذر تسجيل الخروج: " + error.message); return; }
+  location.href = "login.html";
 }
 
 loadProfile();
 loadMyPosts();
 </script>
-
 </body>
 </html>
